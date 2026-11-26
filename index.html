@@ -2312,10 +2312,10 @@ function RmLesson({lesson:l,theme:a,done,onDone,onBack}){
       E("div",{className:"grid gap-2",style:{gridTemplateColumns:"1fr 1fr"}},
         cell("connection","Cách kết hợp","full",true),
         exampleCell,
-        cell("mistake","Lỗi thường gặp"),
-        cell("difference","Điểm khác biệt"),
         cell("context","Ngữ cảnh sử dụng"),
+        cell("mistake","Lỗi thường gặp"),
         cell("similar","Cấu trúc tương tự"),
+        cell("difference","Điểm khác biệt"),
         cell("tip","Mẹo ghi nhớ","full")));
   };
   return E("div",{className:"max-w-3xl mx-auto space-y-5"},
