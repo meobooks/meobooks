@@ -2297,12 +2297,27 @@ function RmLesson({lesson:l,theme:a,done,onDone,onBack}){
   const paras=(l.content||"").split(/\n\s*\n/).filter(Boolean);
   const F=l.fields||null;
   const fieldDefs=[["meaning","Ý nghĩa"],["connection","Cách kết hợp"],["context","Ngữ cảnh sử dụng"],["example","✍️ Câu ví dụ"],["translation","Dịch nghĩa"],["similar","Cấu trúc tương tự"],["difference","Điểm khác biệt"],["mistake","Lỗi thường gặp"],["tip","Mẹo ghi nhớ"]];
-  const fieldCard=f=>E("div",{style:card,className:"p-5 rounded-3xl border space-y-3"},
-    E("div",{className:"rounded-2xl px-4 py-3 font-extrabold",style:{backgroundColor:a.accentSoft}},"#"+(l.sort||"")+" "+l.title),
-    E("div",{className:"grid gap-2",style:{gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))"}},
-      fieldDefs.filter(([k])=>f[k]).map(([k,lab])=>E("div",{key:k,className:"rounded-2xl px-4 py-3",style:{backgroundColor:a.accentSoft,gridColumn:k==="tip"?"1 / -1":undefined}},
-        E("p",{className:"text-[11px] font-extrabold",style:{color:a.accent}},lab),
-        E("p",{className:"text-sm whitespace-pre-line mt-0.5"},f[k])))));
+  const fieldCard=f=>{
+    const cell=(k,lab,cls,big)=>f[k]?E("div",{key:k,className:"rounded-2xl px-4 py-3",style:{backgroundColor:a.accentSoft,gridColumn:cls==="full"?"1 / -1":undefined}},
+      E("p",{className:"text-[11px] font-extrabold",style:{color:a.accent}},lab),
+      E("p",{className:big?"text-lg font-bold whitespace-pre-line mt-1":"text-sm whitespace-pre-line mt-0.5"},f[k])):null;
+    const exampleCell=f.example?E("div",{key:"ex",className:"rounded-2xl px-4 py-3",style:{backgroundColor:a.accentSoft,gridColumn:"1 / -1"}},
+      E("p",{className:"text-[11px] font-extrabold",style:{color:a.accent}},"✍️ Câu ví dụ"),
+      E("p",{className:"text-base font-bold whitespace-pre-line mt-1"},f.example),
+      f.translation&&E("p",{className:"text-sm mt-1 opacity-80 whitespace-pre-line"},f.translation)):null;
+    return E("div",{style:card,className:"p-5 rounded-3xl border space-y-3"},
+      E("div",{style:{display:"flex",alignItems:"baseline",gap:10,flexWrap:"wrap"}},
+        E("h3",{className:"font-extrabold text-lg"},"#"+(l.sort||"")+" "+l.title),
+        f.meaning&&E("span",{className:"text-xs opacity-80"},"Ý nghĩa: "+f.meaning)),
+      E("div",{className:"grid gap-2",style:{gridTemplateColumns:"1fr 1fr"}},
+        cell("connection","Cách kết hợp","full",true),
+        exampleCell,
+        cell("mistake","Lỗi thường gặp"),
+        cell("difference","Điểm khác biệt"),
+        cell("context","Ngữ cảnh sử dụng"),
+        cell("similar","Cấu trúc tương tự"),
+        cell("tip","Mẹo ghi nhớ","full")));
+  };
   return E("div",{className:"max-w-3xl mx-auto space-y-5"},
     btn("← Lộ trình",onBack,false),
     F?fieldCard(F):null,
