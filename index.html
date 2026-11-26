@@ -2295,11 +2295,20 @@ function RmLesson({lesson:l,theme:a,done,onDone,onBack}){
     return null;
   };
   const paras=(l.content||"").split(/\n\s*\n/).filter(Boolean);
+  const F=l.fields||null;
+  const fieldDefs=[["meaning","Ý nghĩa"],["connection","Cách kết hợp"],["context","Ngữ cảnh sử dụng"],["example","✍️ Câu ví dụ"],["translation","Dịch nghĩa"],["similar","Cấu trúc tương tự"],["difference","Điểm khác biệt"],["mistake","Lỗi thường gặp"],["tip","Mẹo ghi nhớ"]];
+  const fieldCard=f=>E("div",{style:card,className:"p-5 rounded-3xl border space-y-3"},
+    E("div",{className:"rounded-2xl px-4 py-3 font-extrabold",style:{backgroundColor:a.accentSoft}},"#"+(l.sort||"")+" "+l.title),
+    E("div",{className:"grid gap-2",style:{gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))"}},
+      fieldDefs.filter(([k])=>f[k]).map(([k,lab])=>E("div",{key:k,className:"rounded-2xl px-4 py-3",style:{backgroundColor:a.accentSoft,gridColumn:k==="tip"?"1 / -1":undefined}},
+        E("p",{className:"text-[11px] font-extrabold",style:{color:a.accent}},lab),
+        E("p",{className:"text-sm whitespace-pre-line mt-0.5"},f[k])))));
   return E("div",{className:"max-w-3xl mx-auto space-y-5"},
     btn("← Lộ trình",onBack,false),
-    E("h2",{className:"text-2xl font-extrabold"},l.title),
-    l.note&&E("p",{className:"text-xs opacity-75 -mt-3"},l.note),
-    E("div",{style:card,className:"p-6 rounded-3xl border space-y-3"},
+    F?fieldCard(F):null,
+    !F&&E("h2",{className:"text-2xl font-extrabold"},l.title),
+    !F&&l.note&&E("p",{className:"text-xs opacity-75 -mt-3"},l.note),
+    !F&&E("div",{style:card,className:"p-6 rounded-3xl border space-y-3"},
       paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
     exs.length===0
       ? btn(done?"Đã đọc ✓":"Đánh dấu đã đọc",()=>{if(!done)onDone(l.id)},true)
