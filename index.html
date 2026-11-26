@@ -800,7 +800,7 @@ function GamesHub({jl,theme:a,notebooks=[],nbViews={},stats={},onXp,toast}){
 
 const NAV_GROUPS=[
   [{id:"home",label:"Home"},{id:"notebooks",label:"My Notebooks"}],
-  [{id:"vocab",label:"Word Garden"},{id:"jstudy",label:"Study Nook"},{id:"jyt",label:"Listening Lounge"},{id:"games",label:"Playroom"},{id:"planner",label:"Study Planner"}],
+  [{id:"vocab",label:"Word Garden"},{id:"jstudy",label:"Study Nook"},{id:"jyt",label:"Listening Lounge"},{id:"games",label:"Playroom"},{id:"planner",label:"Study Planner"},{id:"roadmap",label:"Lantern Lane"}],
   [{id:"favorites",label:"Favorites"},{id:"recent",label:"Recently Edited"},{id:"trash",label:"Trash"}],
   [{id:"settings",label:"Settings"}]
 ];
@@ -896,7 +896,7 @@ function JlptVocab({jl:o,theme:a,notebooks:nbs=[],stats:vs={},onSyncToNotebook})
           l.reading&&E("span",{className:"text-sm opacity-70"},l.reading),
           l.sino_viet&&E("span",{style:{backgroundColor:a.accentSoft},className:"text-[11px] font-bold px-2 py-0.5 rounded-full"},l.sino_viet)),
         E("div",{className:"text-sm font-bold mt-0.5"},l.meaning)),
-      E("button",{title:"Phát âm",onClick:()=>speak(front(l),"Japanese"),className:"tap-fx text-xs font-bold px-2 py-1 rounded-lg",style:{backgroundColor:a.accentSoft}},"Nghe"),
+      E("button",{title:"Phát âm",onClick:()=>speak(front(l),langOfWord(l,nbs)),className:"tap-fx text-xs font-bold px-2 py-1 rounded-lg",style:{backgroundColor:a.accentSoft}},"Nghe"),
       E("button",{title:"Yêu thích",onClick:()=>o.updateVocab(l.id,{favorite:!l.favorite}),className:"text-lg"},l.favorite?"★":"☆")),
     l.example_jp&&E("p",{className:"text-xs opacity-80"},"例: ",l.example_jp,l.example_vi?E("span",{className:"opacity-70"}," — ",l.example_vi):null),
     E("div",{className:"flex flex-wrap items-center gap-2 pt-1"},
@@ -1022,7 +1022,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
         if(ev.code==="Space"){ev.preventDefault();setFcViewer(f=>({...f,flipped:!f.flipped}))}
         else if(ev.key==="ArrowRight"){ev.preventDefault();setFcViewer(f=>({...f,idx:(f.idx+1)%f.words.length,flipped:!1}))}
         else if(ev.key==="ArrowLeft"){ev.preventDefault();setFcViewer(f=>({...f,idx:(f.idx-1+f.words.length)%f.words.length,flipped:!1}))}
-        else if(ev.key==="s"||ev.key==="S"){const w=fcViewer.words[fcViewer.idx];w&&speak(front(w),"Japanese")}
+        else if(ev.key==="s"||ev.key==="S"){const w=fcViewer.words[fcViewer.idx];w&&speak(front(w),langOfWord(w,nbs))}
         return;
       }
       const k=kref.current;if(!k.on||ev.repeat)return;
@@ -1413,7 +1413,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
           :E("div",{className:"space-y-2"},
               E("h3",{className:"text-4xl font-extrabold"},front(w)),
               w.reading&&w.reading!==front(w)&&E("p",{className:"text-lg opacity-75"},w.reading),
-              E("button",{onClick:ev=>{ev.stopPropagation();speak(front(w),"Japanese")},style:{backgroundColor:a.accentSoft},className:"tap-fx mt-2 px-3 py-1.5 rounded-xl text-xs font-bold"},"Nghe phát âm (S)"))),
+              E("button",{onClick:ev=>{ev.stopPropagation();speak(front(w),langOfWord(w,nbs))},style:{backgroundColor:a.accentSoft},className:"tap-fx mt-2 px-3 py-1.5 rounded-xl text-xs font-bold"},"Nghe phát âm (S)"))),
       E("div",{className:"flex items-center justify-between gap-3"},
         E("button",{onClick:()=>setFcViewer(f=>({...f,idx:(f.idx-1+f.words.length)%f.words.length,flipped:!1})),style:{backgroundColor:a.accentSoft,color:a.text},className:"tap-fx flex-1 py-3 rounded-2xl text-xs font-extrabold"},"◀ Thẻ trước"),
         E("button",{onClick:()=>{o.reviewCard(w.id,4);onXp(1,{k:"cards",n:1});setFcViewer(f=>({...f,idx:(f.idx+1)%f.words.length,flipped:!1}))},style:{backgroundColor:"#D1FAE5",color:"#065F46"},className:"tap-fx flex-1 py-3 rounded-2xl text-xs font-extrabold"},"Đã nhớ (+1 XP) →"),
@@ -1557,7 +1557,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
   const hintBox=wrong&&E("div",{className:"text-left text-xs space-y-1 p-3 rounded-2xl mt-3 fade-in",style:{backgroundColor:"#FEE2E2",color:"#7F1D1D"}},
     E("div",{className:"font-extrabold"},"⚠️ Bạn đã trả lời sai câu này — Từ này sẽ quay lại học từ đầu sau khi hết vòng!"),
     (N.hint||[]).map((h,i)=>E("div",{key:i},h)),
-    E("button",{onClick:()=>speak(front(N.v),"Japanese"),className:"tap-fx mt-1 px-2.5 py-1 rounded-lg bg-white/90 text-[11px] font-bold",style:{color:"#4A3F5C"}},"Nghe phát âm"));
+    E("button",{onClick:()=>speak(front(N.v),langOfWord(N.v,nbs)),className:"tap-fx mt-1 px-2.5 py-1 rounded-lg bg-white/90 text-[11px] font-bold",style:{color:"#4A3F5C"}},"Nghe phát âm"));
 
   const stepDots=curItem.steps.map((stId,idx)=>{
     const done=idx<curItem.si,active=idx===curItem.si;
@@ -2250,6 +2250,103 @@ function InteractiveSentenceCard({
   );
 }
 
+const langOfWord=(v,nbs)=>{const nb=(nbs||[]).find(n=>n.id===nbOf(v));const s=nb&&nb.subject;return s==="Chinese"?"Chinese":s==="English"?"English":"Japanese"};
+/* ===================== LANTERN LANE · Lộ trình (nội dung từ Supabase) ===================== */
+const RM_LEVELS=[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"}];
+const rmNorm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");
+function RmLesson({lesson:l,theme:a,done,onDone,onBack}){
+  const E=React.createElement;
+  const exs=Array.isArray(l.exercises)?l.exercises:[];
+  const[ans,setAns]=React.useState({});
+  const[checked,setChecked]=React.useState(false);
+  const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
+  const btn=(label,fn,pr)=>E("button",{onClick:fn,className:"tap-fx px-4 py-2 rounded-xl text-xs font-extrabold",style:{backgroundColor:pr?a.accent:a.accentSoft,color:pr?"#fff":a.text}},label);
+  const ok=(ex,v)=>{
+    if(ex.type==="choice")return v===ex.answer;
+    if(ex.type==="fill")return Array.isArray(ex.answer)?ex.answer.some(x=>rmNorm(x)===rmNorm(v)):rmNorm(ex.answer)===rmNorm(v);
+    if(ex.type==="order"){const sel=Array.isArray(v)?v:[];return sel.map(k=>ex.words[k]).join(" ")===(ex.answer||[]).join(" ")}
+    if(ex.type==="match"){const m=(v&&v.map)||{};return (ex.pairs||[]).every((_,li)=>m[li]===li)}
+    return false;
+  };
+  const score=exs.filter((ex,i)=>ok(ex,ans[i])).length;
+  const check=()=>{setChecked(true);if(exs.length>0&&score===exs.length&&!done)onDone(l.id)};
+  const setA=(i,val)=>setAns({...ans,[i]:val});
+  const body=(ex,i)=>{
+    const v=ans[i];
+    if(ex.type==="choice")return (ex.options||[]).map((o,k)=>E("button",{key:k,disabled:checked,onClick:()=>setA(i,k),className:"block w-full text-left px-3 py-2 rounded-xl text-sm border",style:{backgroundColor:v===k?a.accent:a.card,color:v===k?"#fff":a.text,borderColor:a.border}},o));
+    if(ex.type==="fill")return E("input",{value:v||"",disabled:checked,onChange:e=>setA(i,e.target.value),placeholder:"Nhập đáp án...",className:"w-full px-3 py-2 rounded-xl border text-sm",style:{borderColor:a.border,backgroundColor:a.card,color:a.text}});
+    if(ex.type==="order"){
+      const sel=Array.isArray(v)?v:[];
+      const chip=(k,on)=>E("button",{key:"w"+k+(on?"s":"p"),disabled:checked,onClick:()=>setA(i,on?sel.filter(x=>x!==k):[...sel,k]),className:"px-3 py-1.5 rounded-xl text-sm font-bold",style:{backgroundColor:on?a.accent:a.card,color:on?"#fff":a.text,border:"1px solid "+a.border}},ex.words[k]);
+      return E("div",{className:"space-y-2"},
+        E("div",{className:"flex flex-wrap gap-2 min-h-[36px]"},sel.map(k=>chip(k,true))),
+        E("div",{className:"flex flex-wrap gap-2"},(ex.words||[]).map((_,k)=>!sel.includes(k)&&chip(k,false))));
+    }
+    if(ex.type==="match"){
+      const cur=v||{map:{},sel:null};
+      const pairs=ex.pairs||[];
+      const rorder=pairs.map((_,k)=>(k+1)%pairs.length);
+      const used=Object.values(cur.map);
+      const set=nv=>setA(i,{...cur,...nv});
+      return E("div",{className:"grid grid-cols-2 gap-2"},
+        E("div",{className:"space-y-2"},pairs.map((p,li)=>E("button",{key:"l"+li,disabled:checked||cur.map[li]!==undefined,onClick:()=>set({sel:li}),className:"block w-full px-3 py-2 rounded-xl text-sm font-bold border",style:{backgroundColor:cur.sel===li?a.accent:a.card,color:cur.sel===li?"#fff":a.text,borderColor:a.border}},p.l))),
+        E("div",{className:"space-y-2"},rorder.map((pi,k)=>E("button",{key:"r"+k,disabled:checked||used.includes(pi)||cur.sel===null,onClick:()=>set({map:{...cur.map,[cur.sel]:pi},sel:null}),className:"block w-full px-3 py-2 rounded-xl text-sm border",style:{backgroundColor:used.includes(pi)?a.accentSoft:a.card,color:a.text,borderColor:a.border}},pairs[pi].r))));
+    }
+    return null;
+  };
+  const paras=(l.content||"").split(/\n\s*\n/).filter(Boolean);
+  return E("div",{className:"max-w-3xl mx-auto space-y-5"},
+    btn("← Lộ trình",onBack,false),
+    E("h2",{className:"text-2xl font-extrabold"},l.title),
+    l.note&&E("p",{className:"text-xs opacity-75 -mt-3"},l.note),
+    E("div",{style:card,className:"p-6 rounded-3xl border space-y-3"},
+      paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
+    exs.length===0
+      ? btn(done?"Đã đọc ✓":"Đánh dấu đã đọc",()=>{if(!done)onDone(l.id)},true)
+      : E("div",{style:card,className:"p-6 rounded-3xl border space-y-4"},
+          E("h3",{className:"font-extrabold text-base"},"Bài tập"),
+          exs.map((ex,i)=>E("div",{key:i,className:"rounded-2xl p-4 space-y-3",style:{backgroundColor:a.accentSoft}},
+            E("p",{className:"font-bold text-sm"},(i+1)+". "+(ex.q||"")),
+            body(ex,i),
+            checked&&E("p",{className:"text-xs font-bold "+(ok(ex,ans[i])?"text-emerald-700":"text-rose-600")},ok(ex,ans[i])?"Đúng!":"Chưa đúng"+(ex.explain?" · "+ex.explain:"")))),
+          E("div",{className:"flex items-center gap-3 flex-wrap"},
+            !checked?btn("Kiểm tra",check,true):E("span",{className:"text-sm font-extrabold"},"Điểm: "+score+"/"+exs.length+(score===exs.length?" · Hoàn thành! 🎉":"")),
+            checked&&btn("Làm lại",()=>{setAns({});setChecked(false)},false))));
+}
+function N2Roadmap({theme:a,done,onDone}){
+  const E=React.createElement;
+  const[lv,setLv]=React.useState("n5");
+  const[books,setBooks]=React.useState([]);
+  const[lessons,setLessons]=React.useState([]);
+  const[loading,setLoading]=React.useState(true);
+  const[err,setErr]=React.useState("");
+  const[open,setOpen]=React.useState(null);
+  React.useEffect(()=>{
+    let alive=true;
+    (async()=>{
+      if(!supabase){if(alive){setErr("Chiếc đèn lồng đang được thắp, bạn quay lại sau nhé 🏮");setLoading(false)}return}
+      const[b,l]=await Promise.all([
+        supabase.from("roadmap_books").select("*").order("sort",{ascending:true}),
+        supabase.from("roadmap_lessons").select("*").order("sort",{ascending:true})]);
+      if(!alive)return;
+      if(b.error||l.error)setErr("Chiếc đèn lồng đang được thắp, bạn quay lại sau nhé 🏮");
+      setBooks(b.data||[]);setLessons(l.data||[]);setLoading(false);
+    })();
+    return()=>{alive=false};
+  },[]);
+  if(open)return E(RmLesson,{lesson:open,theme:a,done:!!(done&&done[open.id]),onDone:onDone,onBack:()=>setOpen(null)});
+  const lb=books.filter(b=>b.level===lv);
+  const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
+  return E("div",{className:"max-w-3xl mx-auto space-y-6"},
+    E("h2",{className:"text-2xl font-extrabold"},"Lantern Lane"),
+    E("div",{className:"flex flex-wrap gap-2"},RM_LEVELS.map(x=>E("button",{key:x.id,onClick:()=>setLv(x.id),className:"tap-fx px-4 py-2 rounded-xl text-xs font-extrabold",style:{backgroundColor:x.id===lv?a.accent:a.accentSoft,color:x.id===lv?"#fff":a.text}},x.title))),
+    loading?E("p",{className:"text-sm opacity-70"},"Đang tải lộ trình…"):
+    err?E("p",{className:"text-sm text-rose-600 font-bold"},err):
+    lb.length===0?E("div",{style:card,className:"p-8 rounded-3xl border text-center"},E("p",{className:"text-sm font-bold opacity-80"},"Chưa có sách nào cho "+lv.toUpperCase()+".")):
+    lb.map(b=>E("div",{key:b.id,style:card,className:"p-6 rounded-3xl border space-y-3"},
+      E("h3",{className:"font-extrabold text-base"},b.title),
+      lessons.filter(x=>x.book_id===b.id).map(x=>{const d=!!(done&&done[x.id]);return E("button",{key:x.id,onClick:()=>setOpen(x),className:"tap-fx w-full text-left rounded-2xl px-4 py-3 flex items-center justify-between gap-2",style:{backgroundColor:a.accentSoft,color:a.text}},E("span",{className:"font-bold text-sm"},x.title),E("span",{className:"text-xs font-extrabold"},d?"✓ Xong":"Học ▶"))}))));
+}
 function YtListening({theme:a,prefs:S,getPrefs,save,onSaveUnifiedVocab,findDup,notebooks=[],nbViews={},onSaveNbViews,onXp,toast}){
   const E=React.createElement;
   const lib=S.ytLib||[],mist=S.ytMistakes||[];
@@ -3596,6 +3693,8 @@ function App(){
         w==="vocab"&&React.createElement(JlptVocab,{jl:Ge,theme:n,notebooks:E,stats:S.vstats||{},onSyncToNotebook:syncWordToNotebook}),
 
         w==="jstudy"&&React.createElement(JlptStudy,{jl:Ge,theme:n,stats:S.vstats||{},notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},reviewDone:S.jlptReviewDone||"",onReviewDone:day=>{const s0=de.current.prefs,O={...s0,jlptReviewDone:day};de.current.prefs=O,d(O),W({prefs:O})},onXp:ve}),
+
+        w==="roadmap"&&React.createElement(N2Roadmap,{theme:n,done:S.roadmapDone||{},onDone:id=>fe({roadmapDone:{...(S.roadmapDone||{}),[id]:true}})}),
 
         w==="jyt"&&React.createElement(YtListening,{theme:n,prefs:S,getPrefs:()=>de.current.prefs,save:patch=>{const s0=de.current.prefs,O={...s0,...patch};de.current.prefs=O,d(O),W({prefs:O})},onSaveUnifiedVocab:saveUnifiedFromYt,findDup:Ge.findDup,notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},onXp:x=>ve(x),toast:K}),
 
