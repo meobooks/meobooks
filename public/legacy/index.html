@@ -864,25 +864,21 @@ function JlptVocab({jl:o,theme:a,notebooks:nbs=[],stats:vs={},onSyncToNotebook})
   const E=React.createElement;
   const[c,setC]=useState(""),[st,setSt]=useState("all"),[fav,setFav]=useState(false),[cl,setCl]=useState("all"),[u,D]=useState(null),[R,setR]=useState(null),[bulk,setBulk]=useState(null),[bulkNb,setBulkNb]=useState(""),[open,setOpen]=useState({}),[lim,setLim]=useState({}),[dupAlert,setDupAlert]=useState(null);
   const q=c.trim().toLowerCase();
-  const P=useMemo(()=>o.vocab.filter(p=>(st==="all"||p.status===st)&&(!fav||p.favorite)&&(cl==="all"||classOf(vs,p,o.srs)===cl)&&(!q||[p.word,p.kanji,p.reading,p.sino_viet,p.meaning,p.topic].some(h=>String(h||"").toLowerCase().includes(q)))).slice().sort(byNewest),[o.vocab,o.srs,q,st,fav,cl,vs]);
-    const sugg=useMemo(()=>{const q=String((u&&u.word)||"").trim().toLowerCase();if(!q)return[];return o.vocab.filter(v=>(!u||v.id!==u.id)&&[v.word,v.kanji,v.reading].some(x=>String(x||"").toLowerCase().includes(q))).slice(0,5)},[o.vocab,u&&u.word]);
+  const P=useMemo(()=>meoFeat.vocabList.filterVocab({vocab:o.vocab,srs:o.srs,q,status:st,favOnly:fav,cls:cl,vs}),[o.vocab,o.srs,q,st,fav,cl,vs]);
+    const sugg=useMemo(()=>meoFeat.vocabList.suggestionsFor(o.vocab,u,5),[o.vocab,u&&u.word]);
   if(!o.ready)return E(JLoading,{theme:a});
   const known=new Set(nbs.map(n=>n.id));
   const nbTitleById=id=>{const x=nbs.find(n=>n.id===id);return x?cleanT(x.title):"Chưa phân sổ"};
   const groups=[...nbs.map(n=>({id:n.id,title:n.title,color:n.color})),{id:"_",title:"Chưa phân sổ",color:a.accentSoft}];
   const inG=(v,g)=>g.id==="_"?!known.has(nbOf(v)):nbOf(v)===g.id;
   const filtering=!!q||st!=="all"||fav||cl!=="all";
-  const counts=o.vocab.reduce((l,p)=>(l[p.status]=(l[p.status]||0)+1,l),{});
+  const counts=meoFeat.vocabList.statusCounts(o.vocab);
   const N={borderColor:a.border,backgroundColor:a.card,color:a.text};
   const firstNb=(nbs[0]&&nbs[0].id)||"";
 
   const liveDup=useMemo(()=>{
     if(!u)return null;
-    const chk=(u.kanji||u.word||"").trim();
-    if(!chk)return null;
-    const found=o.findDup(chk)||o.findDup((u.word||"").trim());
-    if(found&&found.id!==R)return found;
-    return null;
+    return meoFeat.vocabList.liveDuplicate(u,R,o.findDup);
   },[u&&u.word,u&&u.kanji,R,o.vocab]);
 
   const submit=async(ev,forceAdd=false)=>{
