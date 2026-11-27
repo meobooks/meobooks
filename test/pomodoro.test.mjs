@@ -43,3 +43,9 @@ t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
+
+// Nút Pomodoro phải nằm trên thanh bên (aside có z-40) trên màn hình lớn
+const legacyPZ = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+assert.equal(legacyPZ.split('no-print fixed bottom-4 left-4 z-50').length - 1, 2);
+assert.equal(legacyPZ.includes('no-print fixed bottom-4 left-4 z-40'), false);
+console.log('ok - nút Pomodoro có z-50, nằm trên thanh bên');
