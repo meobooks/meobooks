@@ -10,3 +10,6 @@ export function resolveLevel(levels, lv) {
 export function booksFor(books, level, lang) {
   return books.filter((b) => b.level === level && (b.lang || 'ja') === lang);
 }
+
+// Chuẩn hóa chuỗi để so khớp: bỏ khoảng trắng thừa, chữ thường.
+export const rmNorm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");

@@ -126,3 +126,9 @@ Hai phần này sẽ làm ở đợt tiếp theo.
 GamesHub không có logic riêng để tách, chỉ điều hướng giữa hai trò chơi nên không cần module.
 Phần đọc danh sách sách và bài học của Lantern Lane gọi Supabase, nên thuộc đợt 3.
 Kiểm thử: `test/noitu.test.mjs`, `test/reader.test.mjs`, `test/roadmap.test.mjs`.
+
+Đợt 3 (giai đoạn 2, làm một phần): đã tách các hàm dùng chung của từ vựng và kế hoạch vào
+`src/features/vocab.js` (nbOf, withNb, byNewest, classOf, langOfWord), `src/features/plan.js`
+(planCfg), và thêm rmNorm vào `roadmap.js`. Chưa tách: planToday, lenientOk/exactOk và hệ
+thống SRS (phụ thuộc hàm tiện ích khác), toàn bộ phần gọi Supabase (useJlpt, sync, realtime)
+và giao diện JLPT, Study, Notebook. Các phần đó cần kiểm trên tài khoản thật.

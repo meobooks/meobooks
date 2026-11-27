@@ -31,3 +31,7 @@ t('legacy dùng roadmap qua meoFeat', () => {
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
+// Bổ sung: rmNorm (chuẩn hóa chuỗi so khớp)
+import * as RM2 from '../src/features/roadmap.js';
+assert.equal(RM2.rmNorm('  Hello   World '), 'hello world');
+console.log('ok - rmNorm: bỏ khoảng trắng thừa, chữ thường');

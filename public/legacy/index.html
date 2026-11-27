@@ -189,9 +189,9 @@ const JCard=({theme:o,className:a="",children:c,style:b})=>React.createElement("
 const MODES=[{id:"jp_to_vi",label:"Chọn đáp án: Nhật → Việt"},{id:"vi_to_jp",label:"Chọn đáp án: Việt → Nhật"},{id:"type_reading",label:"Kiểm tra 1: Điền cách đọc"},{id:"type_meaning",label:"Kiểm tra 2: Điền nghĩa"},{id:"type_word",label:"Kiểm tra 3: Điền từ tiếng Nhật"}],isMC=o=>o==="jp_to_vi"||o==="vi_to_jp",pickOpts=(o,a,c,b)=>{const v=new Set([b]),A=shuffle(o.filter(f=>f.id!==a.id));for(const f of A){const L=c(f);if(L&&!v.has(L)&&v.add(L),v.size>=4)break}return shuffle([...v])},hintOf=v=>{const h=[];if(v.reading)h.push("Cách đọc: "+v.reading);if(v.sino_viet)h.push("Hán Việt: "+v.sino_viet);if(v.meaning)h.push("Nghĩa: "+v.meaning);if(v.example_jp)h.push("Ví dụ: "+v.example_jp+(v.example_vi?" — "+v.example_vi:""));return h},buildQ=(o,a,c)=>{const hint=hintOf(a);if(o==="jp_to_vi")return{v:a,mode:o,prompt:front(a),sub:a.reading&&a.reading!==front(a)?a.reading:"",correct:a.meaning,options:pickOpts(c,a,b=>b.meaning,a.meaning),hint};if(o==="vi_to_jp")return{v:a,mode:o,prompt:a.meaning,correct:front(a),options:pickOpts(c,a,front,front(a)),hint};if(o==="type_reading")return{v:a,mode:o,prompt:front(a),sub:"Điền cách đọc (hiragana / romaji)",correct:a.reading||front(a),accepts:[a.reading,a.word,a.kanji].filter(Boolean),hint:hint.filter(x=>!x.startsWith("Cách đọc"))};if(o==="type_meaning")return{v:a,mode:o,prompt:front(a),sub:(a.reading&&a.reading!==front(a)?"("+a.reading+") ":"")+"Điền nghĩa tiếng Việt",correct:a.meaning,accepts:String(a.meaning||"").split(/[,;/、，]/).map(x=>x.trim()).concat([a.meaning]).filter(Boolean),hint:hint.filter(x=>!x.startsWith("Nghĩa"))};return{v:a,mode:"type_word",prompt:a.meaning,sub:(a.reading?"Cách đọc: "+a.reading+" · ":"")+"Điền từ tiếng Nhật",correct:front(a),accepts:[a.word,a.kanji].filter(Boolean),hint}};
 
 const cleanT=s=>String(s||"").replace(/[\u{1F000}-\u{1FAFF}\u{FE0F}\u{2B50}\u{2600}-\u{26FF}]/gu,"").trim();
-const nbOf=v=>{const t=(v.tags||[]).find(x=>String(x).startsWith("nb:"));return t?String(t).slice(3):""};
-const withNb=(tags,nb)=>{const r=(Array.isArray(tags)?tags:[]).filter(x=>!String(x).startsWith("nb:"));if(nb)r.push("nb:"+nb);return r};
-const byNewest=(x,y)=>(y.created_at||"").localeCompare(x.created_at||"");
+const nbOf=meoFeat.vocab.nbOf;
+const withNb=meoFeat.vocab.withNb;
+const byNewest=meoFeat.vocab.byNewest;
 
 /* ===================== TRÒ CHƠI · BẮN TỪ ===================== */
 const BT_MONO={};
@@ -856,7 +856,7 @@ const uiBgStyle=(t,u)=>{
 const DEF_COLS=[{id:"word",label:"Từ vựng"},{id:"reading",label:"Cách đọc"},{id:"kanji",label:"Hán tự"},{id:"meaning",label:"Nghĩa"},{id:"pos",label:"Từ loại"},{id:"example",label:"Ví dụ"},{id:"note",label:"Ghi chú"}];
 const FIXED_COLS={word:"Từ vựng",reading:"Cách đọc",meaning:"Nghĩa"},normCols=l=>{const a=(l&&l.length?l:DEF_COLS).map(c=>FIXED_COLS[c.id]?{...c,label:FIXED_COLS[c.id]}:c);Object.keys(FIXED_COLS).forEach(id=>{if(!a.some(c=>c.id===id))a.push({id,label:FIXED_COLS[id]})});return a};
 const CL_LABEL={tough:"Hay sai",learn:"Chưa thuộc",known:"Đã thuộc"},CL_BG={tough:"#FBD5D5",learn:"#FFF0C9",known:"#D5F2E0"};
-const classOf=(vs,v,srs)=>{const s=(vs&&vs[v.id])||{ok:0,bad:0,streak:0},t=s.ok+s.bad;if(s.bad>=2&&s.bad/Math.max(1,t)>=.35&&s.streak<4)return"tough";const iv=(srs&&srs[v.id]&&srs[v.id].interval_days)||0;if(v.status==="mastered"||s.streak>=5||(s.streak>=3&&iv>=4))return"known";return"learn"};
+const classOf=meoFeat.vocab.classOf;
 const classBadge=(k,st)=>React.createElement("span",{key:"cb",title:st?("Đúng "+st.ok+" · Sai "+st.bad):"Chưa ôn lần nào",style:{backgroundColor:CL_BG[k],color:"#4A3F5C"},className:"text-[11px] font-bold px-2 py-0.5 rounded-full"},CL_LABEL[k]);
 
 /* ===================== TỪ VỰNG (Thống nhất + Cảnh báo trùng lặp) ===================== */
@@ -1911,7 +1911,7 @@ function MochiPet({pet:raw,xpEarned:earned,level:lvl=1,theme:a,onUpdate,shop}){
 
 /* ===== LỊCH HỌC THÔNG MINH ===== */
 const DAYN=["T2","T3","T4","T5","T6","T7","CN"],idxOf=k=>(new Date(k+"T00:00:00").getDay()+6)%7;
-const planCfg=S=>({newPerDay:10,days:[1,1,1,1,1,1,1],goalDate:"",notify:false,...((S&&S.plan)||{})});
+const planCfg=meoFeat.plan.planCfg;
 const planToday=(jl,S)=>{
   const cfg=planCfg(S),td=dayKey(),vs=(S&&S.vstats)||{},act=(S&&S.activity)||{},base=cfg.newPerDay;
   const due=[],hard=[],fresh=[],nextMap={};
@@ -2120,10 +2120,10 @@ function InteractiveSentenceCard({
   );
 }
 
-const langOfWord=(v,nbs)=>{const nb=(nbs||[]).find(n=>n.id===nbOf(v));const s=nb&&nb.subject;return s==="Chinese"?"Chinese":s==="English"?"English":"Japanese"};
+const langOfWord=meoFeat.vocab.langOfWord;
 /* ===================== LANTERN LANE · Lộ trình (nội dung từ Supabase) ===================== */
 const RM_LANGS=[{id:"ja",title:"Tiếng Nhật"},{id:"zh",title:"Tiếng Trung"},{id:"en",title:"Tiếng Anh"}];RM_LV_BY_LANG={ja:[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"}],zh:[{id:"hsk1",title:"HSK 1"},{id:"hsk2",title:"HSK 2"},{id:"hsk3",title:"HSK 3"},{id:"hsk4",title:"HSK 4"},{id:"hsk5",title:"HSK 5"},{id:"hsk6",title:"HSK 6"}],en:[{id:"a1",title:"A1"},{id:"a2",title:"A2"},{id:"b1",title:"B1"},{id:"b2",title:"B2"},{id:"c1",title:"C1"},{id:"c2",title:"C2"}]};
-const rmNorm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");
+const rmNorm=meoFeat.roadmap.rmNorm;
 function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
   const E=React.createElement;
   const dm=doneMap||{};
