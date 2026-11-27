@@ -905,7 +905,7 @@ function JlptVocab({jl:o,theme:a,notebooks:nbs=[],stats:vs={},onSyncToNotebook})
     D(null);
   };
   const importBulk=async(forceAll=false)=>{
-    const rows=bulk.split("\n").map(h=>h.split(" - ").map(m=>m.trim())).filter(h=>h[0]&&h[2]).map(h=>({word:h[0],reading:h[1],meaning:h[2],example_jp:h[3],tags:withNb([],bulkNb||firstNb)}));
+    const rows=meoFeat.bulkVocab.parseBulkLines(bulk,bulkNb||firstNb);
     if(!rows.length)return o.toast("Không có dòng hợp lệ (Từ - Cách đọc - Nghĩa)");
     const res=await o.addMany(rows,{skipDup:!forceAll});
     if(onSyncToNotebook&&res.items)res.items.forEach(it=>onSyncToNotebook(it.id,{...it,notebookId:bulkNb||firstNb}));
@@ -3331,11 +3331,8 @@ function App(){
   const Pt=()=>{
     if(!k||!Ve.trim())return;
     const dupWords=[];
-    const t=Ve.trim().split(`\n`).map((s,r)=>{
-      const x=s.split(/[-|:;\t]/).map(i=>i.trim());
-      if(Ge.ready&&x[0]&&Ge.findDup(x[0]))dupWords.push(x[0]);
-      return{id:"v-bulk-"+Date.now()+"-"+r,word:x[0]||"",reading:x[1]||"",kanji:x[0]||"",meaning:x[2]||x[1]||"",pos:"Từ vựng",example:x[3]||"",translation:"",note:"",status:"learning"};
-    });
+    const t=meoFeat.bulkVocab.parseVocabPaste(Ve);
+    t.forEach(r=>{if(Ge.ready&&r.word&&Ge.findDup(r.word))dupWords.push(r.word)});
     $({vocabRows:[...k.vocabRows||[],...t]});
     et(""),Re(!1);
     if(dupWords.length){

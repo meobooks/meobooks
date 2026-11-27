@@ -40,7 +40,7 @@ t('legacy gọi đúng 3 chỗ qua meoFeat, không còn thẻ script cũ', () =>
 t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
   assert.ok(app.includes("import * as pomodoro from '../features/pomodoro.js';"));
   const featLine = app.split('\n').find((l) => l.includes('window.meobooksFeatures = {')) || '';
-  for (const name of ['pomodoro', 'mochiPet', 'bantu', 'youtubeText', 'noitu', 'reader', 'roadmap', 'vocab', 'plan', 'srs', 'answer', 'smartSession', 'question', 'progression', 'studyFlow', 'studySession', 'vocabList']) {
+  for (const name of ['pomodoro', 'mochiPet', 'bantu', 'youtubeText', 'noitu', 'reader', 'roadmap', 'vocab', 'plan', 'srs', 'answer', 'smartSession', 'question', 'progression', 'studyFlow', 'studySession', 'vocabList', 'bulkVocab']) {
     assert.ok(new RegExp('\\b' + name + '\\b').test(featLine), 'thiếu module ' + name + ' trong window.meobooksFeatures');
   }
 });

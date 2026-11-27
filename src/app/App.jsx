@@ -16,10 +16,11 @@ import * as progression from '../features/progression.js';
 import * as studyFlow from '../features/study-flow.js';
 import * as studySession from '../features/study-session.js';
 import * as vocabList from '../features/vocab-list.js';
+import * as bulkVocab from '../features/bulk-vocab.js';
 
 // Legacy là script thuần nên không import được từ src/. App gắn các hàm logic lên window
 // trước khi khung iframe được tạo; legacy đọc qua window.parent (cùng origin).
-window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer, smartSession, question, progression, studyFlow, studySession, vocabList };
+window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer, smartSession, question, progression, studyFlow, studySession, vocabList, bulkVocab };
 
 // Giai đoạn 1: chạy nguyên bản app cũ (đã áp bản vá matching) trong khung toàn màn hình.
 // Giao diện, theme, Supabase, localStorage đều giữ y nguyên vì app cũ chạy không thay đổi.
