@@ -132,3 +132,8 @@ Kiểm thử: `test/noitu.test.mjs`, `test/reader.test.mjs`, `test/roadmap.test.
 (planCfg), và thêm rmNorm vào `roadmap.js`. Chưa tách: planToday, lenientOk/exactOk và hệ
 thống SRS (phụ thuộc hàm tiện ích khác), toàn bộ phần gọi Supabase (useJlpt, sync, realtime)
 và giao diện JLPT, Study, Notebook. Các phần đó cần kiểm trên tài khoản thật.
+
+Đợt 3 (tiếp): đã tách `src/features/answer.js` (kiểm đáp án: norm, lenientOk, exactOk và các
+hàm phụ), và `src/features/srs.js` (dayKey, addDaysKey, idxOf, DAYN, sm2, planToday). Kiểm thử:
+`test/answer.test.mjs`, `test/srs.test.mjs`. Còn lại: phần gọi Supabase và realtime
+(useJlpt, sync, tải roadmap) và giao diện JLPT, Study, Notebook. Các phần này cần kiểm trên tài khoản thật.
