@@ -10,10 +10,11 @@ import * as vocab from '../features/vocab.js';
 import * as plan from '../features/plan.js';
 import * as srs from '../features/srs.js';
 import * as answer from '../features/answer.js';
+import * as smartSession from '../features/smart-session.js';
 
 // Legacy là script thuần nên không import được từ src/. App gắn các hàm logic lên window
 // trước khi khung iframe được tạo; legacy đọc qua window.parent (cùng origin).
-window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer };
+window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer, smartSession };
 
 // Giai đoạn 1: chạy nguyên bản app cũ (đã áp bản vá matching) trong khung toàn màn hình.
 // Giao diện, theme, Supabase, localStorage đều giữ y nguyên vì app cũ chạy không thay đổi.

@@ -1100,40 +1100,18 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
    *   Theo dõi riêng 3 bài kiểm tra tự luận (testAllCorrect).
    * - Nếu ở lần 2 (attempt >= 2), học viên điền đúng cả 3 bài kiểm tra tự luận (hoặc vừa hoàn tất 3 bài kiểm tra đúng mà trước đó ở lần 2 đã trắc nghiệm đúng), chỉ cần thêm 1 lần chọn Nhật -> Việt và 1 lần Việt -> Nhật ("reinforce_mc") nữa là hoàn thành!
    */
-  const FULL_STEPS=["jp_to_vi","vi_to_jp","type_reading","type_meaning","type_word"];
+  const FULL_STEPS=meoFeat.smartSession.FULL_STEPS;
   const REINFORCE_STEPS=["jp_to_vi","vi_to_jp"];
 
-  const makeInitialQueue=(words,maxCount=12)=>{
-    const prioritized=words.map(v=>({v,k:Math.random()/({tough:3,learn:1.5,known:.6}[classOf(vs,v,o.srs)])})).sort((x,y)=>x.k-y.k).map(x=>x.v).slice(0,maxCount);
-    return prioritized.map(w=>({
-      vocabId:w.id,
-      attempt:1,
-      stage:"full", // "full" (5 bước) hoặc "reinforce" (2 bước củng cố sau lần 2 điền đúng)
-      steps:[...FULL_STEPS],
-      si:0,
-      failedThisPass:false,
-      testsPassedInAttempt2:0
-    }));
-  };
+  const makeInitialQueue=(words,maxCount=12)=>meoFeat.smartSession.makeInitialQueue(words,{vs,srs:o.srs},maxCount);
 
   const guard=()=>{if(sess)o.toast("Đã thay buổi học dở bằng buổi mới");return true};
 
-  const shuffleArr=arr=>{const r=arr.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
+  const shuffleArr=meoFeat.smartSession.shuffleArr;
 
   /* Trộn câu hỏi: mỗi lượt gồm `size` từ, mọi câu hỏi của các từ đó được xáo lẫn vào nhau,
      nhưng với từng từ vẫn giữ đúng thứ tự bước (chọn đáp án trước, điền sau). */
-  const buildPlan=(queue,size)=>{
-    const plan=[];
-    for(let b=0;b<queue.length;b+=size){
-      const bag=[];
-      for(let i=b;i<Math.min(b+size,queue.length);i++){
-        const it=queue[i];
-        for(let k=it.si;k<it.steps.length;k++)bag.push(i);
-      }
-      plan.push(...shuffleArr(bag));
-    }
-    return plan;
-  };
+  const buildPlan=meoFeat.smartSession.buildPlan;
 
   const startSmartSession=(title,words,kind="smart",maxCount=12,shuffle=false,mixSize=0,viewRef=null)=>{
     if(!guard())return;
