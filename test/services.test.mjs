@@ -319,6 +319,7 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
       return {
         select(cols) { calls.push(['select', cols]); return { eq(c, v) { calls.push(['eq', c, v]); return { maybeSingle() { calls.push(['maybeSingle']); return Promise.resolve({ data: { user_id: v }, error: null }); } }; } }; },
         upsert(row, opts) { calls.push(['upsert', row, opts]); return Promise.resolve({ error: null }); },
+        insert(row) { calls.push(['insert', row]); return Promise.resolve({ error: null }); },
       };
     },
     channel(name) {
@@ -344,6 +345,8 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
     check(calls[0][1] === 'mochi_user_data' || calls[0][0] === 'from', 'sync: upsertRow gọi bảng mochi_user_data');
     const up = calls.find((c) => c[0] === 'upsert');
     check(deq(up[1], { user_id: 'u1', prefs: { a: 1 }, tasks: [], updated_at: '2026-11-27T00:00:00.000Z' }) && deq(up[2], { onConflict: 'user_id' }), 'sync: upsertRow đúng dòng và onConflict user_id');
+    const ins = await svc.sync.insertRow('u3', { prefs: { b: 2 } }, '2026-11-27T00:00:00.000Z');
+    check(!ins.error && calls.some((c) => c[0] === 'insert' && c[1].user_id === 'u3' && c[1].prefs.b === 2) && !calls.some((c) => c[0] === 'upsert'), 'sync: insertRow chỉ insert, không upsert');
     await svc.sync.upsertRow('u2', { prefs: {} });
     const up2 = calls.filter((c) => c[0] === 'upsert')[1];
     check(up2[1].user_id === 'u2' && /^\d{4}-\d\d-\d\dT/.test(up2[1].updated_at), 'sync: upsertRow tự điền updated_at khi không truyền');
@@ -380,7 +383,7 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
   check(!legacy.includes('mochi_local_') && !legacy.includes('mochi_dirty_') && !legacy.includes('jlpt_local_'), 'legacy: không còn khóa mochi_local_/mochi_dirty_/jlpt_local_ viết tay');
   check(!legacy.includes('mochi_last_user') && !legacy.includes('mochi_notif') && !legacy.includes('mochi_ai_key') && !legacy.includes('mochi_smart_session_v2'), 'legacy: không còn khóa last_user/notif/ai_key/smart_session viết tay');
   check(!legacy.includes('from("mochi_user_data")') && !legacy.includes('supabase.channel('), 'legacy: không còn gọi bảng mochi_user_data/kênh realtime trực tiếp');
-  check(legacy.includes('sync.fetchRow(') && legacy.includes('sync.upsertRow(') && legacy.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
+  check(legacy.includes('sync.insertRow(e.id,O)') && legacy.includes('sync.fetchRow(') && legacy.includes('sync.upsertRow(') && legacy.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
   check((legacy.match(/sync\.upsertRow\(/g) || []).length === 2 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 2, 'legacy: 2 chỗ upsertRow, 2 chỗ fetchRow');
   check(!/sync\.upsertRow\(e\.id,O\)/.test(legacy), 'legacy: không ghi dữ liệu mặc định lên tài khoản khi chưa tải được');
   check(legacy.includes('meoCloudLoaded=true') && legacy.includes('if(!meoCloudLoaded)'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');

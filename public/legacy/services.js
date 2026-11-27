@@ -147,6 +147,10 @@
     upsertRow(userId, data, updatedAt) {
       return requireClient().from(this.TABLE).upsert(this.buildUpsertRow(userId, data, updatedAt), { onConflict: 'user_id' });
     },
+    // Tạo dòng mới (chỉ insert): thất bại nếu dòng đã tồn tại, nên không bao giờ ghi đè dữ liệu cũ trên máy chủ.
+    insertRow(userId, data, updatedAt) {
+      return requireClient().from(this.TABLE).insert(this.buildUpsertRow(userId, data, updatedAt));
+    },
     // Nghe thay đổi UPDATE của chính người dùng. onRow nhận dòng mới. Trả về { unsubscribe }.
     subscribeRealtime(userId, onRow) {
       const c = requireClient();

@@ -3221,7 +3221,10 @@ function App(){
         const O=localObj||createInitialSeed(t);
         d(O.prefs),G(O.notebooks),U(O.pages),ae(O.flashcards),se(O.tasks);
         try{window.meobooksServices.localStore.setLocalData(e.id,O)}catch{}
-        p("error"),m("Chưa tải được dữ liệu tài khoản. Chưa lưu lên máy chủ để tránh ghi đè.")
+        // Máy chủ chưa trả về dòng nào: chỉ TẠO dòng mới (insert), không bao giờ ghi đè dòng đã có
+        const{error:ie}=await window.meobooksServices.sync.insertRow(e.id,O);
+        if(ie){p("error"),m("Chưa tải được dữ liệu tài khoản. Chưa lưu lên máy chủ để tránh ghi đè.")}
+        else{meoCloudLoaded=true;p("saved"),m("")}
       }
     }catch(F){console.error(F),p("error"),m(F.message||"Không thể kết nối tới máy chủ Supabase."),applyLocal()}
   };
