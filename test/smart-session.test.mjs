@@ -53,9 +53,33 @@ t('buildPlan: lượt chia theo size, không trộn lẫn giữa các lượt', 
   assert.equal(plan.slice(4).every((x) => x === 2 || x === 3), true);
 });
 
+t('pickReviewPool: ưu tiên từ tạo trước hôm nay, sắp theo next_review, giới hạn số lượng', () => {
+  const day = (y, m, d) => new Date(y, m - 1, d, 12).toISOString();
+  const vocab = [
+    { id: 'old1', created_at: day(2026, 11, 10) },
+    { id: 'old2', created_at: day(2026, 11, 11) },
+    { id: 'new1', created_at: day(2026, 11, 27) },
+  ];
+  const srs = { old1: { next_review: '2026-11-30' }, old2: { next_review: '2026-11-20' }, new1: { next_review: '2026-11-01' } };
+  const pool = S.pickReviewPool({ vocab, srs, today: '2026-11-27', limit: 8 });
+  assert.deepEqual(pool.map((v) => v.id), ['old2', 'old1']);
+});
+
+t('pickReviewPool: không có từ cũ thì dùng toàn bộ; giới hạn limit', () => {
+  const day = (y, m, d) => new Date(y, m - 1, d, 12).toISOString();
+  const vocab = [{ id: 'a', created_at: day(2026, 11, 27) }, { id: 'b', created_at: day(2026, 11, 27) }, { id: 'c', created_at: day(2026, 11, 27) }];
+  assert.equal(S.pickReviewPool({ vocab, srs: {}, today: '2026-11-27', limit: 2 }).length, 2);
+  assert.equal(S.pickReviewPool({ vocab, srs: {}, today: '2026-11-27' }).length, 3);
+});
+
+t('pickReviewPool: danh sách rỗng trả về rỗng', () => {
+  assert.deepEqual(S.pickReviewPool({ vocab: [], srs: {}, today: '2026-11-27' }), []);
+});
+
 t('legacy: dùng module thay vì định nghĩa lại', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('const buildPlan=meoFeat.smartSession.buildPlan'));
+  assert.ok(legacy.includes('meoFeat.smartSession.pickReviewPool({'));
   assert.ok(legacy.includes('meoFeat.smartSession.makeInitialQueue('));
   assert.ok(!legacy.includes('const buildPlan=(queue,size)=>'));
 });

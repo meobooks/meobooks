@@ -1,5 +1,6 @@
 // Thuật toán buổi học thông minh JLPT (tách từ legacy). Hàm thuần: nhận RNG để có thể kiểm thử lặp lại.
 import { classOf } from './vocab.js';
+import { dayKey } from './srs.js';
 
 // 5 bước đầy đủ cho lần học đầu tiên của mỗi từ
 export const FULL_STEPS = ['jp_to_vi', 'vi_to_jp', 'type_reading', 'type_meaning', 'type_word'];
@@ -48,4 +49,19 @@ export const buildPlan = (queue, size, rng = Math.random) => {
     plan.push(...shuffleArr(bag, rng));
   }
   return plan;
+};
+
+// Chọn nhóm ôn nhanh: ưu tiên từ đã tạo trước hôm nay, sắp theo ngày ôn tới hạn sớm nhất.
+// Nếu không có từ nào tạo trước hôm nay thì dùng toàn bộ từ vựng.
+export const pickReviewPool = ({ vocab = [], srs = {}, today, limit = 8 }) => {
+  const dayOf = (v) => { const d = new Date(v.created_at || 0); return isNaN(d) ? '' : dayKey(d); };
+  const older = vocab.filter((v) => dayOf(v) && dayOf(v) < today);
+  return (older.length ? older : vocab)
+    .slice()
+    .sort((x, y) => {
+      const p1 = (srs[x.id] || {}).next_review || '';
+      const p2 = (srs[y.id] || {}).next_review || '';
+      return p1 < p2 ? -1 : p1 > p2 ? 1 : 0;
+    })
+    .slice(0, limit);
 };

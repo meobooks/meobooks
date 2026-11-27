@@ -1214,8 +1214,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
   };
 
   const startReview=()=>{
-    const older=o.vocab.filter(v=>cd(v)&&cd(v)<today);
-    const pool=(older.length?older:o.vocab).slice().sort((x,y)=>{const p1=(o.srs[x.id]||{}).next_review||"",p2=(o.srs[y.id]||{}).next_review||"";return p1<p2?-1:p1>p2?1:0}).slice(0,8);
+    const pool=meoFeat.smartSession.pickReviewPool({vocab:o.vocab,srs:o.srs,today,limit:8});
     if(!pool.length)return o.toast("Chưa có từ vựng nào để ôn nhanh!");
     startSmartSession("Ôn nhanh thông minh",pool,"review",8);
   };
