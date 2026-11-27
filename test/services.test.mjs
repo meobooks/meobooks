@@ -1,6 +1,7 @@
 // Kiểm thử public/legacy/services.js (cầu nối giai đoạn 2).
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import * as DM from '../src/features/data-merge.js';
 
 const here = new URL('.', import.meta.url);
 const servicesSrc = readFileSync(new URL('../public/legacy/services.js', import.meta.url), 'utf8');
@@ -34,10 +35,9 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check(svc.hasClient() === false, 'chưa có client khi mới nạp');
 }
 
-// 2) mergeData/mergeList khớp 100% với bản GỐC trong legacy
-const start = legacy.indexOf('const stampOf=');
-const end = legacy.indexOf(',ROUTE_TO_NAV=');
-const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeList};')();
+// 2) mergeData/mergeList trong services khớp 100% với bản chuẩn src/features/data-merge.js
+// Bản chuẩn nay nằm trong src/features/data-merge.js (legacy đã dùng module này)
+const orig = DM;
 {
   const { svc } = makeWindow();
   let seed = 12345;
@@ -58,7 +58,7 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
     const A = items('x'), B = items('x');
     if (!deq(orig.mergeList(A, B), svc.sync.mergeList(A, B))) bad++;
   }
-  check(bad === 0, `mergeData/mergeList khớp bản gốc legacy (2000 ca, lệch: ${bad})`);
+  check(bad === 0, `mergeData/mergeList services khớp bản chuẩn (2000 ca, lệch: ${bad})`);
 }
 
 // 3) localStore: khóa và định dạng giữ nguyên
