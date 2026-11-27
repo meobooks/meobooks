@@ -645,10 +645,10 @@ function NoiTu({jl,theme:a,notebooks:nbs=[],nbViews={},stats:vs={},onXp=()=>{},t
   const allDecks=[...decks,...views];
   const deck=allDecks.find(d=>d.id===deckId)||decks[0];
   const usedSet=new Set(usedIds());
-  const playPool=order==="fresh"?deck.list.filter(x=>!usedSet.has(x.v.id)):deck.list;
+  const playPool=meoFeat.noitu.playPool(deck.list,usedSet,order);
   const usedInDeck=deck.list.filter(x=>usedSet.has(x.v.id)).length;
-  const maxN=Math.min(100,playPool.length),canPlay=playPool.length>=10;
-  const n=Math.max(10,Math.min(cnt,maxN));
+  const canPlay=playPool.length>=10;
+  const n=meoFeat.noitu.roundSize(cnt,playPool.length);
 
   const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
   const chip={backgroundColor:a.accentSoft,color:a.text,borderRadius:99,padding:"5px 12px",fontSize:12,fontWeight:800};
@@ -658,14 +658,12 @@ function NoiTu({jl,theme:a,notebooks:nbs=[],nbViews={},stats:vs={},onXp=()=>{},t
   const fmt=t=>Math.floor(t/60)+":"+String(t%60).padStart(2,"0");
 
   /* ---------- logic ---------- */
-  const resetDeckUsed=()=>{const ids=new Set(deck.list.map(x=>x.v.id));lsSet("nt_used",JSON.stringify(usedIds().filter(id=>!ids.has(id))));setUsedTick(x=>x+1)};
+  const resetDeckUsed=()=>{lsSet("nt_used",JSON.stringify(meoFeat.noitu.usedAfterReset(usedIds(),deck.list.map(x=>x.v.id))));setUsedTick(x=>x+1)};
   const makeBoard=items=>({L:shuffle(items),R:shuffle(items),m:[]});
   const start=()=>{
     if(!canPlay)return toast("Bộ này cần ít nhất 10 từ có nghĩa để chơi!");
     const picked=shuffle(playPool).slice(0,n);
-    const nb=Math.ceil(n/BATCH),batches=[];
-    let from=0;
-    for(let i=0;i<nb;i++){const size=Math.round((n-from)/(nb-i));batches.push(picked.slice(from,from+size));from+=size}
+    const batches=meoFeat.noitu.splitBatches(picked,BATCH);
     lock.current=false;
     setSelL(null);setSelR(null);setBad(null);setSec(0);t0.current=Date.now();
     setG({n,deckId:deck.id,deckTitle:deck.title,batches,bi:0,done:0,wrong:0,missed:{},cur:makeBoard(batches[0])});
@@ -673,10 +671,10 @@ function NoiTu({jl,theme:a,notebooks:nbs=[],nbViews={},stats:vs={},onXp=()=>{},t
   };
   const finish=ng=>{
     const secs=Math.max(1,Math.round((Date.now()-t0.current)/1000));
-    const score=Math.max(0,ng.n*10+Math.max(0,ng.n*4-secs)-ng.wrong*3);
+    const score=meoFeat.noitu.roundScore({n:ng.n,secs,wrong:ng.wrong});
     let best=score;
     try{const LS=window.meobooksServices.localStore,o=LS.getBestScore("nt",ng.deckId);best=Math.max(o,score);if(score>o)LS.setBestScore("nt",ng.deckId,score)}catch(x){}
-    const xp=Math.min(10,Math.max(1,Math.floor(ng.n/5)));
+    const xp=meoFeat.noitu.roundXp(ng.n);
     try{onXp(xp)}catch(x){}
     ntSnd.end();
     setRes({n:ng.n,secs,wrong:ng.wrong,score,best,xp,deckTitle:ng.deckTitle,missed:Object.values(ng.missed)});
@@ -1702,10 +1700,10 @@ function PageRead({page:p,defFont,onSyncVocab,compact}){
   const paper=PAPER_STYLES.find(x=>x.id===p.paperStyle)||PAPER_STYLES[1];
   const cols=normCols(p.customColumns);
   const rows=p.vocabRows||[];
-  const gl=p.grammarList||(p.grammarData&&p.type==="grammar"?[{id:"g0",...p.grammarData}]:[]);
+  const gl=meoFeat.reader.grammarListOf(p);
   const kd=p.type==="kanji"?p.kanjiData:null;
-  const extra=["reading","listening","writing"].includes(p.type)?Object.entries(p[p.type+"Data"]||{}).filter(([k,v])=>v):[];
-  const hasInk=p.ink&&p.ink.strokes&&p.ink.strokes.length;
+  const extra=meoFeat.reader.extraEntriesOf(p);
+  const hasInk=meoFeat.reader.hasInkStrokes(p);
   const hasHtml=p.content&&p.content.replace(/<[^>]*>/g,"").trim().length>0||/<img/.test(p.content||"");
   const empty=!hasHtml&&!hasInk&&!rows.length&&!gl.length&&!kd&&!extra.length;
   const KF=[["reading","Âm đọc"],["hanViet","Âm Hán Việt"],["meaning","Nghĩa"],["radical","Bộ thủ"],["strokes","Số nét"],["compounds","Từ ghép"],["example","Ví dụ"],["notes","Ghi chú"]];
@@ -1754,14 +1752,13 @@ function BookViewer({title,color,pages,startId,theme,defFont,onClose,onEdit}){
   useEffect(()=>{const h=()=>{setVw(window.innerWidth);setVh(window.innerHeight)};addEventListener("resize",h);return()=>removeEventListener("resize",h)},[]);
   const single=vw<860;
   const leaves=useMemo(()=>[{cover:true,title},...pages],[pages,title]);
-  const n=leaves.length,maxS=Math.floor(n/2),maxC=n-1;
-  const startIdx=Math.max(0,leaves.findIndex(x=>!x.cover&&x.id===startId));
+  const n=leaves.length,{maxS,maxC}=meoFeat.reader.bookBounds(n);
+  const startIdx=meoFeat.reader.startLeafIndex(leaves,startId);
   const[s,setS]=useState(Math.ceil(startIdx/2)),[ci,setCi]=useState(startIdx),[anim,setAnim]=useState(null);
   const get=i=>i>=0&&i<n?leaves[i]:null;
   const go=dir=>{
     if(anim)return;
-    if(single){if(dir==="next"&&ci>=maxC)return;if(dir==="prev"&&ci<=0)return}
-    else{if(dir==="next"&&s>=maxS)return;if(dir==="prev"&&s<=0)return}
+    if(!meoFeat.reader.canTurn(dir,single,s,ci,maxS,maxC))return;
     setAnim({dir,go:false});
   };
   const gor=useRef(go);gor.current=go;
