@@ -120,3 +120,9 @@ ruby, tách câu, token hóa) và `src/features/bantu.js` (`btProg`, tiến đ�
 `test/youtube-text.test.mjs`, `test/bantu.test.mjs`. Chưa tách: NoiTu (logic chọn lô và
 đã-dùng nằm trong thân component), BookViewer và PageRead (logic chia trang nằm lẫn với JSX).
 Hai phần này sẽ làm ở đợt tiếp theo.
+
+Đợt 2 (giai đoạn 2): đã tách logic đọc và chơi trong `src/features/`: `noitu.js` (Nối từ),
+`reader.js` (PageRead, BookViewer), `roadmap.js` (Lantern Lane: chọn cấp và lọc sách).
+GamesHub không có logic riêng để tách, chỉ điều hướng giữa hai trò chơi nên không cần module.
+Phần đọc danh sách sách và bài học của Lantern Lane gọi Supabase, nên thuộc đợt 3.
+Kiểm thử: `test/noitu.test.mjs`, `test/reader.test.mjs`, `test/roadmap.test.mjs`.

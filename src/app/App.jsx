@@ -5,10 +5,11 @@ import * as bantu from '../features/bantu.js';
 import { youtubeText } from '../features/youtube-text.js';
 import * as noitu from '../features/noitu.js';
 import * as reader from '../features/reader.js';
+import * as roadmap from '../features/roadmap.js';
 
 // Legacy là script thuần nên không import được từ src/. App gắn các hàm logic lên window
 // trước khi khung iframe được tạo; legacy đọc qua window.parent (cùng origin).
-window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader };
+window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap };
 
 // Giai đoạn 1: chạy nguyên bản app cũ (đã áp bản vá matching) trong khung toàn màn hình.
 // Giao diện, theme, Supabase, localStorage đều giữ y nguyên vì app cũ chạy không thay đổi.

@@ -2290,7 +2290,7 @@ function N2Roadmap({theme:a,done,onDone,subject}){
     return()=>{alive=false};
   },[]);
   if(open)return E(RmLesson,{lesson:open,theme:a,done:!!(done&&done[open.id]),doneMap:done||{},onDone:onDone,onBack:()=>setOpen(null)});
-  const lvE=(RM_LV_BY_LANG[lg]||[]).some(x=>x.id===lv)?lv:(RM_LV_BY_LANG[lg][0]||{}).id;const lb=books.filter(b=>b.level===lvE&&(b.lang||"ja")===lg);
+  const lvE=meoFeat.roadmap.resolveLevel(RM_LV_BY_LANG[lg],lv);const lb=meoFeat.roadmap.booksFor(books,lvE,lg);
   const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
   return E("div",{className:"max-w-3xl mx-auto space-y-6"},
     E("h2",{className:"text-2xl font-extrabold"},"Lantern Lane"),
