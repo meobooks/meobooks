@@ -345,8 +345,10 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
     check(calls[0][1] === 'mochi_user_data' || calls[0][0] === 'from', 'sync: upsertRow gọi bảng mochi_user_data');
     const up = calls.find((c) => c[0] === 'upsert');
     check(deq(up[1], { user_id: 'u1', prefs: { a: 1 }, tasks: [], updated_at: '2026-11-27T00:00:00.000Z' }) && deq(up[2], { onConflict: 'user_id' }), 'sync: upsertRow đúng dòng và onConflict user_id');
+    const n0 = calls.length;
     const ins = await svc.sync.insertRow('u3', { prefs: { b: 2 } }, '2026-11-27T00:00:00.000Z');
-    check(!ins.error && calls.some((c) => c[0] === 'insert' && c[1].user_id === 'u3' && c[1].prefs.b === 2) && !calls.some((c) => c[0] === 'upsert'), 'sync: insertRow chỉ insert, không upsert');
+    const recent = calls.slice(n0);
+    check(!ins.error && recent.some((c) => c[0] === 'insert' && c[1].user_id === 'u3' && c[1].prefs.b === 2) && !recent.some((c) => c[0] === 'upsert'), 'sync: insertRow chỉ insert, không upsert');
     await svc.sync.upsertRow('u2', { prefs: {} });
     const up2 = calls.filter((c) => c[0] === 'upsert')[1];
     check(up2[1].user_id === 'u2' && /^\d{4}-\d\d-\d\dT/.test(up2[1].updated_at), 'sync: upsertRow tự điền updated_at khi không truyền');
