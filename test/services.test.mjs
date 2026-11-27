@@ -388,6 +388,6 @@ const orig = DM;
   check(legacy.includes('sync.insertRow(e.id,O)') && legacy.includes('sync.fetchRow(') && legacy.includes('sync.upsertRow(') && legacy.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
   check((legacy.match(/sync\.upsertRow\(/g) || []).length === 2 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 2, 'legacy: 2 chỗ upsertRow, 2 chỗ fetchRow');
   check(!/sync\.upsertRow\(e\.id,O\)/.test(legacy), 'legacy: không ghi dữ liệu mặc định lên tài khoản khi chưa tải được');
-  check(legacy.includes('meoCloudLoaded=true') && legacy.includes('if(!meoCloudLoaded)'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
+  check(legacy.includes('meoCloudLoaded=true') && legacy.includes('cloudLoaded:meoCloudLoaded'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
   check(legacy.includes('getRaw(k,d)') && legacy.includes('setRaw(k,v)'), 'legacy: lsGet/lsSet chuyển sang getRaw/setRaw');
 }

@@ -3107,12 +3107,13 @@ function App(){
     try{
       meoCloudLoaded=false;const{data:F,error:_}=await window.meobooksServices.sync.fetchRow(e.id);
       if(_){console.error("Supabase fetch error:",_),p("error"),m(_.message||JSON.stringify(_)),applyLocal();return}
-      if(F&&localObj){
+      const plan=meoFeat.syncPolicy.cloudLoadPlan({hasLocal:!!localObj,cloudRow:F});
+      if(plan==="merge"){
         // Tự động hợp nhất (Merge) dữ liệu trên máy & dữ liệu trên tài khoản Supabase để đảm bảo không bao giờ mất dữ liệu
         meoCloudLoaded=true;await it(localObj,F,e);
         return;
       }
-      if(F){
+      if(plan==="apply_cloud"){
         meoCloudLoaded=true;
         d(F.prefs||createInitialSeed(t).prefs),G(F.notebooks||[]),U(F.pages||[]),ae(F.flashcards||[]),se(F.tasks||[]),p("saved"),m("");
         try{window.meobooksServices.localStore.setLocalData(e.id,{prefs:F.prefs,notebooks:F.notebooks,pages:F.pages,flashcards:F.flashcards,tasks:F.tasks})}catch{}
@@ -3146,10 +3147,9 @@ function App(){
     const t={prefs:e.prefs!==void 0?e.prefs:de.current.prefs,notebooks:e.notebooks!==void 0?e.notebooks:de.current.notebooks,pages:e.pages!==void 0?e.pages:de.current.pages,flashcards:e.flashcards!==void 0?e.flashcards:de.current.flashcards,tasks:e.tasks!==void 0?e.tasks:de.current.tasks};
     Ee.current=t,p("saving"),We.current&&clearTimeout(We.current),We.current=setTimeout(async()=>{
       try{window.meobooksServices.localStore.setLocalData(o.id,t),window.meobooksServices.localStore.markDirty(o.id)}catch{}
-      if(!navigator.onLine){p("offline");return}
       try{
-        if(!supabase||o.id==="preview-user"){p("saved");return}
-        if(!meoCloudLoaded){p("error"),m("Chưa tải xong dữ liệu tài khoản, chưa lưu lên máy chủ.");return}
+        const gate=meoFeat.syncPolicy.saveGate({online:navigator.onLine,hasSupabase:!!supabase,isPreview:o.id==="preview-user",cloudLoaded:meoCloudLoaded});
+        if(!gate.upsert){p(gate.status),gate.message&&m(gate.message);return}
         const{error:s}=await window.meobooksServices.sync.upsertRow(o.id,t,qe.current=new Date().toISOString());
         if(s)throw s;
         try{window.meobooksServices.localStore.clearDirty(o.id)}catch{}

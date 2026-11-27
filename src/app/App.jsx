@@ -19,10 +19,11 @@ import * as vocabList from '../features/vocab-list.js';
 import * as bulkVocab from '../features/bulk-vocab.js';
 import * as dataMerge from '../features/data-merge.js';
 import * as seed from '../features/seed.js';
+import * as syncPolicy from '../features/sync-policy.js';
 
 // Legacy là script thuần nên không import được từ src/. App gắn các hàm logic lên window
 // trước khi khung iframe được tạo; legacy đọc qua window.parent (cùng origin).
-window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer, smartSession, question, progression, studyFlow, studySession, vocabList, bulkVocab, dataMerge, seed };
+window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader, roadmap, vocab, plan, srs, answer, smartSession, question, progression, studyFlow, studySession, vocabList, bulkVocab, dataMerge, seed, syncPolicy };
 
 // Giai đoạn 1: chạy nguyên bản app cũ (đã áp bản vá matching) trong khung toàn màn hình.
 // Giao diện, theme, Supabase, localStorage đều giữ y nguyên vì app cũ chạy không thay đổi.
