@@ -40,3 +40,22 @@ console.log('ok - rmNorm: bỏ khoảng trắng thừa, chữ thường');
 const legacyRM = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
 assert.equal(legacyRM.includes('{id:"hsk7-9",title:"HSK 7–9"}'), true);
 console.log('ok - cấp độ tiếng Trung có HSK 7–9');
+
+// parseVocabLines: bảng từ vựng tiếng Trung
+import { parseVocabLines } from '../src/features/roadmap.js';
+const sample = '1|爱|ài|yêu; thích|我爱你。|Wǒ ài nǐ.|Tôi yêu bạn.\n2|吧|ba|nhé; đi; chứ|我们走吧。|Wǒmen zǒu ba.|Chúng ta đi nhé.';
+const rows = parseVocabLines(sample);
+assert.equal(rows.length, 2);
+assert.equal(rows[0].word, '爱');
+assert.equal(rows[0].pinyin, 'ài');
+assert.equal(rows[0].meaning, 'yêu; thích');
+assert.equal(rows[0].example, '我爱你。');
+assert.equal(rows[0].examplePinyin, 'Wǒ ài nǐ.');
+assert.equal(rows[0].exampleMeaning, 'Tôi yêu bạn.');
+assert.equal(parseVocabLines('Đây là đoạn văn bình thường.'), null);
+assert.equal(parseVocabLines(''), null);
+assert.equal(parseVocabLines('1|爱|ài|yêu'), null); // thiếu cột
+console.log('ok - parseVocabLines nhận đúng bảng và bỏ qua văn bản thường');
+assert.equal(legacyRM.includes('meoFeat.roadmap.parseVocabLines(l.content)'), true);
+assert.equal(legacyRM.includes('function VocabTable('), true);
+console.log('ok - legacy có VocabTable và dùng parseVocabLines');

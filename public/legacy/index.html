@@ -2095,6 +2095,25 @@ const langOfWord=meoFeat.vocab.langOfWord;
 /* ===================== LANTERN LANE · Lộ trình (nội dung từ Supabase) ===================== */
 const RM_LANGS=[{id:"ja",title:"Tiếng Nhật"},{id:"zh",title:"Tiếng Trung"},{id:"en",title:"Tiếng Anh"}];RM_LV_BY_LANG={ja:[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"}],zh:[{id:"hsk1",title:"HSK 1"},{id:"hsk2",title:"HSK 2"},{id:"hsk3",title:"HSK 3"},{id:"hsk4",title:"HSK 4"},{id:"hsk5",title:"HSK 5"},{id:"hsk6",title:"HSK 6"},{id:"hsk7-9",title:"HSK 7–9"}],en:[{id:"a1",title:"A1"},{id:"a2",title:"A2"},{id:"b1",title:"B1"},{id:"b2",title:"B2"},{id:"c1",title:"C1"},{id:"c2",title:"C2"}]};
 const rmNorm=meoFeat.roadmap.rmNorm;
+function VocabTable({rows,lessonId,theme:a}){
+  const E=React.createElement;
+  const key="rm_kho_"+lessonId;
+  const[saved,setSaved]=React.useState(()=>{try{const v=JSON.parse(window.meobooksServices.localStore.getRaw(key,"[]"));return Array.isArray(v)?v:[]}catch(e){return[]}});
+  const toggle=stt=>{const next=saved.includes(stt)?saved.filter(x=>x!==stt):[...saved,stt];setSaved(next);try{window.meobooksServices.localStore.setRaw(key,JSON.stringify(next))}catch(e){}};
+  const th="p-2 border-b text-left font-extrabold whitespace-nowrap";
+  return E("div",{className:"overflow-x-auto rounded-2xl border",style:{borderColor:a.border,backgroundColor:a.card}},
+    E("table",{className:"w-full text-xs border-collapse"},
+      E("thead",null,E("tr",{style:{backgroundColor:a.accentSoft}},["STT","Từ vựng","Pinyin","Nghĩa","Câu ví dụ","Pinyin ví dụ","Dịch nghĩa","Kho từ"].map(h=>E("th",{key:h,className:th},h)))),
+      E("tbody",null,rows.map(r=>E("tr",{key:r.stt,className:"border-b"},
+        E("td",{className:"p-2 font-bold"},r.stt),
+        E("td",{className:"p-2 text-base font-bold whitespace-nowrap"},r.word),
+        E("td",{className:"p-2 whitespace-nowrap"},r.pinyin),
+        E("td",{className:"p-2"},r.meaning),
+        E("td",{className:"p-2"},r.example),
+        E("td",{className:"p-2 whitespace-nowrap"},r.examplePinyin),
+        E("td",{className:"p-2"},r.exampleMeaning),
+        E("td",{className:"p-2 text-center"},E("input",{type:"checkbox",checked:saved.includes(r.stt),onChange:()=>toggle(r.stt)})))))));
+}
 function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
   const E=React.createElement;
   const dm=doneMap||{};
@@ -2188,6 +2207,7 @@ function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
   };
   const paras=(l.content||"").split(/\n\s*\n/).filter(Boolean);
   const F=l.fields||null;
+  const vrows=F?null:meoFeat.roadmap.parseVocabLines(l.content);
   const fieldCard=f=>{
     const cell=(k,lab,cls,big)=>f[k]?E("div",{key:k,className:"rounded-2xl px-4 py-3",style:{backgroundColor:a.accentSoft,gridColumn:cls==="full"?"1 / -1":undefined}},
       E("p",{className:"text-[11px] font-extrabold",style:{color:a.accent}},lab),
@@ -2234,7 +2254,7 @@ function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
     !F&&E("h2",{className:"text-2xl font-extrabold"},l.title),
     !F&&l.note&&E("p",{className:"text-xs opacity-75 -mt-3"},l.note),
     !F&&E("div",{style:card,className:"p-6 rounded-3xl border space-y-3"},
-      paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
+      vrows?E(VocabTable,{rows:vrows,lessonId:l.id,theme:a}):paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
     block);
 }
 function N2Roadmap({theme:a,done,onDone,subject}){

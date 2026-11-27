@@ -13,3 +13,21 @@ export function booksFor(books, level, lang) {
 
 // Chuẩn hóa chuỗi để so khớp: bỏ khoảng trắng thừa, chữ thường.
 export const rmNorm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");
+
+// Phân tích nội dung bài từ vựng dạng bảng: mỗi dòng "STT|Từ|Pinyin|Nghĩa|Câu ví dụ|Pinyin ví dụ|Dịch nghĩa".
+// Trả về null nếu nội dung không đúng dạng này (khi đó hiển thị như đoạn văn).
+export function parseVocabLines(text) {
+  const lines = String(text || '').split('\n').map((x) => x.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const rows = lines.map((line) => line.split('|').map((x) => x.trim()));
+  if (!rows.every((r) => r.length >= 7 && /^\d+$/.test(r[0]))) return null;
+  return rows.map((r) => ({
+    stt: r[0],
+    word: r[1],
+    pinyin: r[2],
+    meaning: r[3],
+    example: r[4],
+    examplePinyin: r[5],
+    exampleMeaning: r[6],
+  }));
+}
