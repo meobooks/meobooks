@@ -35,3 +35,8 @@ console.log(`\n${passed} kiểm thử đạt.`);
 import * as RM2 from '../src/features/roadmap.js';
 assert.equal(RM2.rmNorm('  Hello   World '), 'hello world');
 console.log('ok - rmNorm: bỏ khoảng trắng thừa, chữ thường');
+
+// Cấp độ tiếng Trung phải khớp với dữ liệu roadmap_books trên Supabase (có hsk7-9)
+const legacyRM = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+assert.equal(legacyRM.includes('{id:"hsk7-9",title:"HSK 7–9"}'), true);
+console.log('ok - cấp độ tiếng Trung có HSK 7–9');
