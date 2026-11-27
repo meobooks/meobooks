@@ -1,12 +1,40 @@
+import { useEffect, useState } from 'react';
+
+// Giai đoạn 1: chạy nguyên bản app cũ (đã áp bản vá matching) trong khung toàn màn hình.
+// Giao diện, theme, Supabase, localStorage đều giữ y nguyên vì app cũ chạy không thay đổi.
+// Các giai đoạn sau sẽ tách dần từng tính năng sang src/features/.
+const LEGACY_URL = `${import.meta.env.BASE_URL}legacy/index.html`;
+
+// Liên kết trong email của Supabase (đặt lại mật khẩu...) mở trang ngoài này kèm phần
+// #access_token=...&type=recovery hoặc #error=.... Client Supabase nằm trong iframe nên
+// phải chuyển phần # đó vào địa chỉ của iframe để nó đọc được.
+const AUTH_HASH = /^#(?:.*&)?(?:access_token|error|error_code|type)=/;
+
 export default function App() {
+  const [src] = useState(() => {
+    const h = window.location.hash;
+    return AUTH_HASH.test(h) ? LEGACY_URL + h : LEGACY_URL;
+  });
+
+  // Xóa phần # nhạy cảm (chứa token) khỏi thanh địa chỉ của trang ngoài.
+  useEffect(() => {
+    if (AUTH_HASH.test(window.location.hash)) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
+
   return (
-    <main className="app-shell">
-      <h1>Meobooks</h1>
-      <p>Khung Vite đã được thiết lập.</p>
-      <p className="notice">
-        Đây mới là bộ khung kỹ thuật. Các tính năng từ phiên bản cũ sẽ được
-        chuyển sang từng phần và kiểm thử trước khi thay thế bản đang chạy.
-      </p>
-    </main>
+    <iframe
+      src={src}
+      title="Meobooks"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        border: 0,
+        display: 'block',
+      }}
+    />
   );
 }
