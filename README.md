@@ -114,3 +114,9 @@ Còn để sau: đăng ký bị chặn (cấu hình project, không phải lỗi
 Cách nối (giai đoạn 2): `src/app/App.jsx` import các module trong `src/features/` và gắn lên
 `window.meobooksFeatures` trước khi tạo iframe. Legacy là script thuần nên đọc qua biến `meoFeat`
 (lấy từ `window.parent.meobooksFeatures`), không import trực tiếp được.
+
+Đợt 1 (giai đoạn 2, đang làm): đã tách `src/features/youtube-text.js` (khối YTL: link YouTube,
+ruby, tách câu, token hóa) và `src/features/bantu.js` (`btProg`, tiến độ ôn từ). Kiểm thử:
+`test/youtube-text.test.mjs`, `test/bantu.test.mjs`. Chưa tách: NoiTu (logic chọn lô và
+đã-dùng nằm trong thân component), BookViewer và PageRead (logic chia trang nằm lẫn với JSX).
+Hai phần này sẽ làm ở đợt tiếp theo.
