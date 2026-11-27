@@ -1082,7 +1082,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
   kref.current={on:false};
   const today=dayKey();
   const M={borderColor:a.border,backgroundColor:a.card,color:a.text};
-  const due=N=>{const I=o.srs[N.id];return!I||!I.next_review||I.next_review<=today};
+  const due=N=>meoFeat.studySession.isDue(N,o.srs,today);
   const cd=v=>{const d=new Date(v.created_at||0);return isNaN(d)?"":dayKey(d)};
   const known=new Set(nbs.map(n=>n.id));
   const groups=[...nbs.map(n=>({id:n.id,title:n.title,color:n.color})),{id:"_",title:"Chưa phân sổ",color:a.accentSoft}];
@@ -1116,31 +1116,9 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
   const startSmartSession=(title,words,kind="smart",maxCount=12,shuffle=false,mixSize=0,viewRef=null)=>{
     if(!guard())return;
     if(!words.length)return o.toast("Không có từ vựng nào để học!");
-    const srcIds=words.map(v=>v.id);
-    let queue=makeInitialQueue(shuffle?shuffleArr(words):words,maxCount);
-    if(shuffle)queue=shuffleArr(queue);
-    const plan=mixSize?buildPlan(queue,mixSize):null;
+    const sess0=meoFeat.studySession.buildSmartSession({kind,title,viewRef,words,maxCount,shuffle,mixSize,ctx:{vs,srs:o.srs}});
     setSum(null);
-    setSess({
-      kind,
-      title,
-      viewRef,
-      src:srcIds,
-      maxCount,
-      round:1,
-      queue,
-      mix:!!mixSize,
-      mixSize,
-      plan,
-      pi:0,
-      qi:plan?plan[0]:0,
-      nextRoundFailed:[],
-      res:[],
-      picked:null,
-      typed:"",
-      checked:null,
-      requeueNotice:null
-    });
+    setSess(sess0);
     setInS(true);
   };
 
@@ -1155,21 +1133,15 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
   const startSkim=(title,words,viewRef=null)=>{
     if(!guard())return;
     if(!words.length)return o.toast("Không có từ vựng nào để lướt!");
-    const queue=words.map(w=>({vocabId:w.id,attempt:1,stage:"skim",steps:[...REINFORCE_STEPS],si:0,failedThisPass:false,testsPassedInAttempt2:0}));
-    const plan=buildPlan(queue,5);
+    const sess0=meoFeat.studySession.buildSkimSession({title,words,viewRef});
     setSum(null);
-    setSess({kind:"skim",title,viewRef,src:words.map(v=>v.id),maxCount:words.length,mix:true,mixSize:5,plan,pi:0,qi:plan[0],round:1,queue,nextRoundFailed:[],res:[],picked:null,typed:"",checked:null,requeueNotice:null});
+    setSess(sess0);
     setInS(true);
   };
 
   /* Tiến độ học của từng View: các từ đã học xong được lưu trong view.doneIds.
      Thêm từ mới vào View thì lần học sau chỉ học từ mới; muốn học lại tất cả thì bấm "Học lại từ đầu". */
-  const viewProgress=view=>{
-    const done=new Set(view.doneIds||[]);
-    const all=view.wordIds.map(id=>o.vocab.find(v=>v.id===id)).filter(Boolean);
-    const pending=all.filter(v=>!done.has(v.id));
-    return{all,pending,doneN:all.length-pending.length};
-  };
+  const viewProgress=view=>meoFeat.studySession.viewProgress(view,o.vocab);
 
   const resolveViewWords=view=>{
     const{all,pending,doneN}=viewProgress(view);
