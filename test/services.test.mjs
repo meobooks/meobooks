@@ -381,6 +381,8 @@ const orig = new Function(legacy.slice(start, end) + ';return {mergeData,mergeLi
   check(!legacy.includes('mochi_last_user') && !legacy.includes('mochi_notif') && !legacy.includes('mochi_ai_key') && !legacy.includes('mochi_smart_session_v2'), 'legacy: không còn khóa last_user/notif/ai_key/smart_session viết tay');
   check(!legacy.includes('from("mochi_user_data")') && !legacy.includes('supabase.channel('), 'legacy: không còn gọi bảng mochi_user_data/kênh realtime trực tiếp');
   check(legacy.includes('sync.fetchRow(') && legacy.includes('sync.upsertRow(') && legacy.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
-  check((legacy.match(/sync\.upsertRow\(/g) || []).length === 3 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 2, 'legacy: 3 chỗ upsertRow, 2 chỗ fetchRow');
+  check((legacy.match(/sync\.upsertRow\(/g) || []).length === 2 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 2, 'legacy: 2 chỗ upsertRow, 2 chỗ fetchRow');
+  check(!/sync\.upsertRow\(e\.id,O\)/.test(legacy), 'legacy: không ghi dữ liệu mặc định lên tài khoản khi chưa tải được');
+  check(legacy.includes('meoCloudLoaded=true') && legacy.includes('if(!meoCloudLoaded)'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
   check(legacy.includes('getRaw(k,d)') && legacy.includes('setRaw(k,v)'), 'legacy: lsGet/lsSet chuyển sang getRaw/setRaw');
 }

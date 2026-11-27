@@ -94,7 +94,7 @@ h2,h3,h4{font-family:"Baloo 2","Nunito",sans-serif;font-weight:800;letter-spacin
 </head>
 <body>
 <div id="root"><div id="boot"><i></i><span>meobooks đang mở sổ…</span></div></div>
-<script>var meoFeat=(window.parent&&window.parent.meobooksFeatures)||window.meobooksFeatures;</script>
+<script>var meoFeat=(window.parent&&window.parent.meobooksFeatures)||window.meobooksFeatures;var meoCloudLoaded=false;</script>
 <script src="services.js"></script>
 <script>(function bootApp(){
   if(!window.React||!window.ReactDOM){return setTimeout(bootApp,50)}
@@ -3206,27 +3206,28 @@ function App(){
     if(!supabase||e.id==="preview-user"){applyLocal();return}
     if(!navigator.onLine){applyLocal(),p("offline");return}
     try{
-      const{data:F,error:_}=await window.meobooksServices.sync.fetchRow(e.id);
+      meoCloudLoaded=false;const{data:F,error:_}=await window.meobooksServices.sync.fetchRow(e.id);
       if(_){console.error("Supabase fetch error:",_),p("error"),m(_.message||JSON.stringify(_)),applyLocal();return}
       if(F&&localObj){
         // Tự động hợp nhất (Merge) dữ liệu trên máy & dữ liệu trên tài khoản Supabase để đảm bảo không bao giờ mất dữ liệu
-        await it(localObj,F,e);
+        meoCloudLoaded=true;await it(localObj,F,e);
         return;
       }
       if(F){
+        meoCloudLoaded=true;
         d(F.prefs||createInitialSeed(t).prefs),G(F.notebooks||[]),U(F.pages||[]),ae(F.flashcards||[]),se(F.tasks||[]),p("saved"),m("");
         try{window.meobooksServices.localStore.setLocalData(e.id,{prefs:F.prefs,notebooks:F.notebooks,pages:F.pages,flashcards:F.flashcards,tasks:F.tasks})}catch{}
       }else{
         const O=localObj||createInitialSeed(t);
         d(O.prefs),G(O.notebooks),U(O.pages),ae(O.flashcards),se(O.tasks);
         try{window.meobooksServices.localStore.setLocalData(e.id,O)}catch{}
-        const{error:oe}=await window.meobooksServices.sync.upsertRow(e.id,O);
-        oe?(p("error"),m(oe.message||JSON.stringify(oe))):(p("saved"),m(""))
+        p("error"),m("Chưa tải được dữ liệu tài khoản. Chưa lưu lên máy chủ để tránh ghi đè.")
       }
     }catch(F){console.error(F),p("error"),m(F.message||"Không thể kết nối tới máy chủ Supabase."),applyLocal()}
   };
 
   const it=async(e,t,s)=>{
+    meoCloudLoaded=true;
     const r=mergeData(e,t);
     d(r.prefs),G(r.notebooks),U(r.pages),ae(r.flashcards),se(r.tasks),de.current=r,Ee.current=null;
     try{window.meobooksServices.localStore.setLocalData(s.id,r)}catch{}
@@ -3246,6 +3247,7 @@ function App(){
       if(!navigator.onLine){p("offline");return}
       try{
         if(!supabase||o.id==="preview-user"){p("saved");return}
+        if(!meoCloudLoaded){p("error"),m("Chưa tải xong dữ liệu tài khoản, chưa lưu lên máy chủ.");return}
         const{error:s}=await window.meobooksServices.sync.upsertRow(o.id,t,qe.current=new Date().toISOString());
         if(s)throw s;
         try{window.meobooksServices.localStore.clearDirty(o.id)}catch{}
