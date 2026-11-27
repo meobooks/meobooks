@@ -59,3 +59,11 @@ console.log('ok - parseVocabLines nhận đúng bảng và bỏ qua văn bản t
 assert.equal(legacyRM.includes('meoFeat.roadmap.parseVocabLines(l.content)'), true);
 assert.equal(legacyRM.includes('function VocabTable('), true);
 console.log('ok - legacy có VocabTable và dùng parseVocabLines');
+
+// Kho từ: tick mở chọn sổ, bỏ tick xóa khỏi kho; App gắn khoAdd/khoRemove
+const legacyKho = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+assert.equal(legacyKho.includes('khoAdd:khoAddFn,khoRemove:khoRemoveFn,notebooks:E'), true);
+assert.equal(legacyKho.includes('const khoAddFn=async(row,nbId)=>{'), true);
+assert.equal(legacyKho.includes('await Ge.deleteVocab(id)'), true);
+assert.equal(legacyKho.includes('khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks'), true);
+console.log('ok - kho từ được nối từ App xuống bảng');

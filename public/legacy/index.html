@@ -2095,26 +2095,63 @@ const langOfWord=meoFeat.vocab.langOfWord;
 /* ===================== LANTERN LANE · Lộ trình (nội dung từ Supabase) ===================== */
 const RM_LANGS=[{id:"ja",title:"Tiếng Nhật"},{id:"zh",title:"Tiếng Trung"},{id:"en",title:"Tiếng Anh"}];RM_LV_BY_LANG={ja:[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"}],zh:[{id:"hsk1",title:"HSK 1"},{id:"hsk2",title:"HSK 2"},{id:"hsk3",title:"HSK 3"},{id:"hsk4",title:"HSK 4"},{id:"hsk5",title:"HSK 5"},{id:"hsk6",title:"HSK 6"},{id:"hsk7-9",title:"HSK 7–9"}],en:[{id:"a1",title:"A1"},{id:"a2",title:"A2"},{id:"b1",title:"B1"},{id:"b2",title:"B2"},{id:"c1",title:"C1"},{id:"c2",title:"C2"}]};
 const rmNorm=meoFeat.roadmap.rmNorm;
-function VocabTable({rows,lessonId,theme:a}){
+function VocabTable({rows,lessonId,theme:a,khoAdd,khoRemove,notebooks}){
   const E=React.createElement;
   const key="rm_kho_"+lessonId;
-  const[saved,setSaved]=React.useState(()=>{try{const v=JSON.parse(window.meobooksServices.localStore.getRaw(key,"[]"));return Array.isArray(v)?v:[]}catch(e){return[]}});
-  const toggle=stt=>{const next=saved.includes(stt)?saved.filter(x=>x!==stt):[...saved,stt];setSaved(next);try{window.meobooksServices.localStore.setRaw(key,JSON.stringify(next))}catch(e){}};
+  const readMap=()=>{try{const v=JSON.parse(window.meobooksServices.localStore.getRaw(key,"{}"));return v&&typeof v==="object"&&!Array.isArray(v)?v:{}}catch(e){return{}}};
+  const[map,setMap]=React.useState(readMap);
+  const[pending,setPending]=React.useState(null);
+  const[nbId,setNbId]=React.useState(()=>{const l=notebooks||[];const c=l.find(n=>n.subject==="Chinese")||l[0];return c?c.id:""});
+  const[busy,setBusy]=React.useState(false);
+  const[msg,setMsg]=React.useState("");
+  const write=m=>{setMap(m);try{window.meobooksServices.localStore.setRaw(key,JSON.stringify(m))}catch(e){}};
+  const confirmAdd=async()=>{
+    if(!pending||!nbId||!khoAdd)return;
+    const row=rows.find(r=>r.stt===pending);
+    setBusy(true);
+    const id=await khoAdd(row,nbId);
+    setBusy(false);
+    if(!id){setMsg("Chưa thêm được \""+row.word+"\", thử lại sau."); return}
+    write({...map,[pending]:id});
+    setPending(null);
+    setMsg("Đã thêm \""+row.word+"\" vào kho.");
+  };
+  const onTick=async(stt)=>{
+    if(map[stt]){
+      if(!khoRemove)return;
+      setBusy(true);
+      try{await khoRemove(map[stt])}catch(e){}
+      const m={...map}; delete m[stt];
+      write(m); setBusy(false); setMsg("Đã xóa khỏi kho.");
+      return;
+    }
+    setPending(stt); setMsg("");
+  };
   const th="p-2 border-b text-left font-extrabold whitespace-nowrap";
-  return E("div",{className:"overflow-x-auto rounded-2xl border",style:{borderColor:a.border,backgroundColor:a.card}},
-    E("table",{className:"w-full text-xs border-collapse"},
-      E("thead",null,E("tr",{style:{backgroundColor:a.accentSoft}},["STT","Từ vựng","Pinyin","Nghĩa","Câu ví dụ","Pinyin ví dụ","Dịch nghĩa","Kho từ"].map(h=>E("th",{key:h,className:th},h)))),
-      E("tbody",null,rows.map(r=>E("tr",{key:r.stt,className:"border-b"},
-        E("td",{className:"p-2 font-bold"},r.stt),
-        E("td",{className:"p-2 text-base font-bold whitespace-nowrap"},r.word),
-        E("td",{className:"p-2 whitespace-nowrap"},r.pinyin),
-        E("td",{className:"p-2"},r.meaning),
-        E("td",{className:"p-2"},r.example),
-        E("td",{className:"p-2 whitespace-nowrap"},r.examplePinyin),
-        E("td",{className:"p-2"},r.exampleMeaning),
-        E("td",{className:"p-2 text-center"},E("input",{type:"checkbox",checked:saved.includes(r.stt),onChange:()=>toggle(r.stt)})))))));
+  const pendingRow=pending&&rows.find(r=>r.stt===pending);
+  const nbList=notebooks||[];
+  return E("div",{className:"space-y-2"},
+    pendingRow&&E("div",{className:"flex flex-wrap items-center gap-2 p-3 rounded-2xl border",style:{borderColor:a.border,backgroundColor:a.accentSoft}},
+      E("span",{className:"text-xs font-bold"},"Thêm \""+pendingRow.word+"\" vào sổ:"),
+      nbList.length?E("select",{value:nbId,onChange:e=>setNbId(e.target.value),className:"text-xs rounded-lg px-2 py-1 border",style:{backgroundColor:a.card,color:a.text,borderColor:a.border}},nbList.map(n=>E("option",{key:n.id,value:n.id},n.title))):E("span",{className:"text-xs"},"Chưa có sổ nào. Hãy tạo sổ trước."),
+      E("button",{onClick:confirmAdd,disabled:busy||!nbList.length,className:"tap-fx px-3 py-1 rounded-lg text-xs font-extrabold disabled:opacity-40",style:{backgroundColor:a.accent,color:"#fff"}},busy?"Đang lưu…":"Thêm"),
+      E("button",{onClick:()=>setPending(null),className:"tap-fx px-3 py-1 rounded-lg text-xs font-extrabold",style:{backgroundColor:a.card,color:a.text}},"Hủy")),
+    msg&&E("p",{className:"text-xs font-bold opacity-80"},msg),
+    E("div",{className:"overflow-x-auto rounded-2xl border",style:{borderColor:a.border,backgroundColor:a.card}},
+      E("table",{className:"w-full text-xs border-collapse"},
+        E("thead",null,E("tr",{style:{backgroundColor:a.accentSoft}},["STT","Từ vựng","Pinyin","Nghĩa","Câu ví dụ","Pinyin ví dụ","Dịch nghĩa","Kho từ"].map(h=>E("th",{key:h,className:th},h)))),
+        E("tbody",null,rows.map(r=>E("tr",{key:r.stt,className:"border-b"},
+          E("td",{className:"p-2 font-bold"},r.stt),
+          E("td",{className:"p-2 text-base font-bold whitespace-nowrap"},r.word),
+          E("td",{className:"p-2 whitespace-nowrap"},r.pinyin),
+          E("td",{className:"p-2"},r.meaning),
+          E("td",{className:"p-2"},r.example),
+          E("td",{className:"p-2 whitespace-nowrap"},r.examplePinyin),
+          E("td",{className:"p-2"},r.exampleMeaning),
+          E("td",{className:"p-2 text-center"},E("input",{type:"checkbox",checked:!!map[r.stt],disabled:busy,onChange:()=>onTick(r.stt)})))))))
+  );
 }
-function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
+function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack,khoAdd,khoRemove,notebooks}){
   const E=React.createElement;
   const dm=doneMap||{};
   const exs=Array.isArray(l.exercises)?l.exercises:[];
@@ -2254,10 +2291,10 @@ function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
     !F&&E("h2",{className:"text-2xl font-extrabold"},l.title),
     !F&&l.note&&E("p",{className:"text-xs opacity-75 -mt-3"},l.note),
     !F&&E("div",{style:card,className:"p-6 rounded-3xl border space-y-3"},
-      vrows?E(VocabTable,{rows:vrows,lessonId:l.id,theme:a}):paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
+      vrows?E(VocabTable,{rows:vrows,lessonId:l.id,theme:a,khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks}):paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
     block);
 }
-function N2Roadmap({theme:a,done,onDone,subject}){
+function N2Roadmap({theme:a,done,onDone,subject,khoAdd,khoRemove,notebooks}){
   const E=React.createElement;
   const[lv,setLv]=React.useState("n2");const lg=subject==="Chinese"?"zh":subject==="English"?"en":"ja";
   const[books,setBooks]=React.useState([]);
@@ -2280,7 +2317,7 @@ function N2Roadmap({theme:a,done,onDone,subject}){
     })();
     return()=>{alive=false};
   },[]);
-  if(open)return E(RmLesson,{lesson:open,theme:a,done:!!(done&&done[open.id]),doneMap:done||{},onDone:onDone,onBack:()=>setOpen(null)});
+  if(open)return E(RmLesson,{lesson:open,theme:a,done:!!(done&&done[open.id]),doneMap:done||{},onDone:onDone,onBack:()=>setOpen(null),khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks});
   const lvE=meoFeat.roadmap.resolveLevel(RM_LV_BY_LANG[lg],lv);const lb=meoFeat.roadmap.booksFor(books,lvE,lg);
   const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
   return E("div",{className:"max-w-3xl mx-auto space-y-6"},
@@ -3489,6 +3526,15 @@ function App(){
     }
   };
 
+  const khoAddFn=async(row,nbId)=>{
+    if(!Ge.ready)return null;
+    const item={word:row.word,reading:row.pinyin||"",meaning:row.meaning||"",example_jp:row.example||"",notebookId:nbId};
+    const res=await Ge.addMany([{word:item.word,reading:item.reading,meaning:item.meaning,example_jp:item.example_jp,tags:withNb([],nbId)}],{skipDup:true});
+    if(res.added>0&&res.items[0]){syncWordToNotebook(res.items[0].id,{...res.items[0],notebookId:nbId});return res.items[0].id}
+    const dup=Ge.findDup(item.word);
+    return dup?dup.id:null;
+  };
+  const khoRemoveFn=async id=>{await Ge.deleteVocab(id)};
   const Ot=(e,t)=>{k&&(Z.current?(Z.current.insertAdjacentHTML("beforeend",e),$({content:Z.current.innerHTML})):$({content:(k.content||"")+e}),t||K("Đã thêm vào ghi chú"))};
   const Rt=()=>{var t;const e=k||{};return[e.title,(t=Z.current)==null?void 0:t.innerText,(e.vocabRows||[]).map(s=>s.word+" "+s.meaning).join("; "),e.type==="grammar"?JSON.stringify(e.grammarList||e.grammarData||""):"",e.kanjiData?JSON.stringify(e.kanjiData):""].filter(Boolean).join(`\n`).slice(0,3500)};
 
@@ -3711,7 +3757,7 @@ return H("div",{className:"min-h-screen bg-gradient-to-br from-[#F8DDE8] via-[#F
 
         w==="jstudy"&&React.createElement(JlptStudy,{jl:Ge,theme:n,stats:S.vstats||{},notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},reviewDone:S.jlptReviewDone||"",onReviewDone:day=>{const s0=de.current.prefs,O={...s0,jlptReviewDone:day};de.current.prefs=O,d(O),W({prefs:O})},onXp:ve}),
 
-        w==="roadmap"&&React.createElement(N2Roadmap,{theme:n,subject:activeSubj,done:S.roadmapDone||{},onDone:ids=>{const add=Array.isArray(ids)?ids:[ids];const m={...(S.roadmapDone||{})};add.forEach(k=>{m[k]=true});fe({roadmapDone:m})}}),
+        w==="roadmap"&&React.createElement(N2Roadmap,{theme:n,subject:activeSubj,khoAdd:khoAddFn,khoRemove:khoRemoveFn,notebooks:E,done:S.roadmapDone||{},onDone:ids=>{const add=Array.isArray(ids)?ids:[ids];const m={...(S.roadmapDone||{})};add.forEach(k=>{m[k]=true});fe({roadmapDone:m})}}),
 
         w==="jyt"&&React.createElement(YtListening,{theme:n,prefs:S,getPrefs:()=>de.current.prefs,save:patch=>{const s0=de.current.prefs,O={...s0,...patch};de.current.prefs=O,d(O),W({prefs:O})},onSaveUnifiedVocab:saveUnifiedFromYt,findDup:Ge.findDup,notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},onXp:x=>ve(x),toast:K}),
 
