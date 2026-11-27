@@ -95,14 +95,14 @@ trò chơi, phiên học, đăng xuất/đăng nhập lại. Giai đoạn 2 hoà
 
 Dọn dẹp (đã kiểm chứng trên trình duyệt): sửa `preconnect`, bỏ đăng ký `sw.js`.
 
-Tách tính năng (giai đoạn 2, đang làm): Pomodoro (`public/legacy/pomodoro.js`).
+Tách tính năng (giai đoạn 2): Pomodoro (`src/features/pomodoro.js`).
 Phần logic (tính số giây còn lại, ngưỡng 15 phút để tính một phiên, tiêu đề tab) nằm trong
 `window.meobooksFeatures.pomodoro`, và `PomodoroWidget` trong legacy gọi vào đó. Giao diện
 của widget vẫn nằm trong legacy. Kiểm thử: `node test/pomodoro.test.mjs` (4 kiểm thử).
 Chờ người dùng kiểm chứng trên trình duyệt: hẹn giờ 25 phút chạy đúng, tiêu đề tab đếm
 ngược, phiên đủ 15 phút cộng XP, nghỉ 5 phút không cộng XP.
 
-Tách tính năng: Mochi Pet (`public/legacy/mochi-pet.js`, `window.meobooksFeatures.mochiPet`).
+Tách tính năng: Mochi Pet (`src/features/mochi-pet.js`).
 Logic đã tách: giảm chỉ số theo giờ (`decayedStats`), thời gian chờ vuốt ve 10 phút
 (`cooldownLeft`), và trạng thái sau một hành động (`afterAction`, trả null nếu không đủ XP).
 Giao diện, hiệu ứng và tiệm đồ vẫn nằm trong legacy. Kiểm thử: `node test/mochi-pet.test.mjs`
@@ -110,3 +110,7 @@ Giao diện, hiệu ứng và tiệm đồ vẫn nằm trong legacy. Kiểm th�
 thời gian, cho ăn/đi dạo/liếm lông trừ đúng XP, vuốt ve bị khóa 10 phút rồi mở lại.
 
 Còn để sau: đăng ký bị chặn (cấu hình project, không phải lỗi code).
+
+Cách nối (giai đoạn 2): `src/app/App.jsx` import các module trong `src/features/` và gắn lên
+`window.meobooksFeatures` trước khi tạo iframe. Legacy là script thuần nên đọc qua biến `meoFeat`
+(lấy từ `window.parent.meobooksFeatures`), không import trực tiếp được.

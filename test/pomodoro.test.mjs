@@ -1,26 +1,19 @@
-// Kiểm thử public/legacy/pomodoro.js (logic Pomodoro tách từ legacy).
+// Kiểm thử src/features/pomodoro.js và cách legacy nối vào nó.
 import { readFileSync } from 'node:fs';
-import vm from 'node:vm';
 import assert from 'node:assert/strict';
+import * as P from '../src/features/pomodoro.js';
 
-const src = readFileSync(new URL('../public/legacy/pomodoro.js', import.meta.url), 'utf8');
 const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-
-const win = {};
-const ctx = { window: win, console, Math };
-ctx.globalThis = ctx;
-vm.createContext(ctx);
-vm.runInContext(src, ctx);
-const P = win.meobooksFeatures.pomodoro;
+const app = readFileSync(new URL('../src/app/App.jsx', import.meta.url), 'utf8');
 
 let passed = 0;
 function t(name, fn) { fn(); passed++; console.log('ok -', name); }
 
 t('remainingSeconds làm tròn và không âm', () => {
   assert.equal(P.remainingSeconds(10000, 0), 10);
-  assert.equal(P.remainingSeconds(1500, 0), 2);      // 1.5s -> 2 (Math.round)
+  assert.equal(P.remainingSeconds(1500, 0), 2);
   assert.equal(P.remainingSeconds(1000, 1000), 0);
-  assert.equal(P.remainingSeconds(1000, 5000), 0);   // đã quá mốc: 0, không âm
+  assert.equal(P.remainingSeconds(1000, 5000), 0);
 });
 
 t('countsAsSession ngưỡng 15 phút', () => {
@@ -36,14 +29,17 @@ t('documentTitle theo trạng thái chạy', () => {
   assert.equal(P.documentTitle(false, '25:00'), 'meobooks');
 });
 
-t('legacy đã nối đúng 3 chỗ và không còn công thức cũ', () => {
+t('legacy gọi đúng 3 chỗ qua meoFeat, không còn thẻ script cũ', () => {
   const count = (s) => legacy.split(s).length - 1;
-  assert.equal(count('<script src="pomodoro.js"></script>'), 1);
-  assert.equal(count('window.meobooksFeatures.pomodoro.remainingSeconds(R.current,Date.now())'), 1);
-  assert.equal(count('window.meobooksFeatures.pomodoro.countsAsSession(v)&&a(v)'), 1);
-  assert.equal(count('window.meobooksFeatures.pomodoro.documentTitle(u,fmtTime(f))'), 1);
-  assert.equal(count('Math.round((R.current-Date.now())/1e3)'), 0);
-  assert.equal(count('v>=15&&a(v)'), 0);
+  assert.equal(count('meoFeat.pomodoro.remainingSeconds(R.current,Date.now())'), 1);
+  assert.equal(count('meoFeat.pomodoro.countsAsSession(v)&&a(v)'), 1);
+  assert.equal(count('meoFeat.pomodoro.documentTitle(u,fmtTime(f))'), 1);
+  assert.equal(count('src="pomodoro.js"'), 0);
+});
+
+t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
+  assert.ok(app.includes("import * as pomodoro from '../features/pomodoro.js';"));
+  assert.ok(app.includes('window.meobooksFeatures = { pomodoro, mochiPet };'));
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
