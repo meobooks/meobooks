@@ -247,10 +247,18 @@ const btPlay=r=>{
   const seen=new Set();
   return{kana:r,units:u,vars:btVariants(u).filter(v=>!seen.has(v.s)&&seen.add(v.s))};
 };
+/* Từ tiếng Anh / pinyin (tiếng Trung): gõ đúng chữ cái, bỏ dấu và khoảng trắng */
+const btLatin=v=>{
+  const word=String(v.word||""), reading=String(v.reading||"");
+  const src=/^[A-Za-zÀ-ỹ][A-Za-zÀ-ỹ'\- ]*$/.test(word.trim())?word:reading;
+  const t=src.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]/g,"");
+  if(!t||t.length>20)return null;
+  return{kana:t,units:[],vars:[{s:t,b:[...t].map((_,k)=>[k+1,1])}]};
+};
 const btOf=v=>{
   let p=btPlay(v.reading);
   if(!p&&/^[぀-ヿー]+$/.test(v.word||""))p=btPlay(v.word);
-  return p;
+  return p||btLatin(v);
 };
 const btProg=(p,t)=>{
   if(!t)return 0;
@@ -2433,8 +2441,8 @@ function N2Roadmap({theme:a,done,onDone}){
       return E("div",{key:b.id,style:card,className:"p-6 rounded-3xl border space-y-3"},
         E("button",{onClick:()=>setClosed({...closed,[b.id]:!isClosed}),className:"w-full flex items-center justify-between gap-2 text-left"},
           E("h3",{className:"font-extrabold text-base"},b.title),
-          E("span",{className:"text-xs font-extrabold"},(all.length&&doneN===all.length?"✓ Hoàn thành":doneN+"/"+all.length+" bài")+(isClosed?" ▸":" ▾"))),
-        !isClosed&&shown.map(x=>{const d=!!(done&&done[x.id]);return E("button",{key:x.id,onClick:()=>setOpen(x),className:"tap-fx w-full text-left rounded-2xl px-4 py-3 flex items-center justify-between gap-2",style:{backgroundColor:a.accentSoft,color:a.text}},E("span",{className:"font-bold text-sm"},x.title),E("span",{className:"text-xs font-extrabold"},d?"✓ Xong":"Học ▶"))}),
+          E("span",{className:"text-xs font-extrabold"},(all.length&&doneN===all.length?"✓ Hoàn thành":doneN+"/"+all.length+" bài")+(isClosed?" ▸":" ▾"))),(()=>{const pct=all.length?Math.round(doneN*100/all.length):0;return E("div",{key:"bar",className:"space-y-1"},E("div",{className:"w-full h-2.5 rounded-full overflow-hidden",style:{backgroundColor:a.accentSoft}},E("div",{className:"h-full rounded-full transition-all duration-500",style:{width:pct+"%",backgroundColor:a.accent}})),E("p",{className:"text-[11px] font-extrabold opacity-80 text-right"},pct+"%"))})(),
+        !isClosed&&shown.slice().sort((p,q)=>(p.note||"").localeCompare(q.note||"")||(p.sort||0)-(q.sort||0)).reduce((acc,x)=>{if(x.note&&x.note!==acc.last){acc.last=x.note;acc.out.push(E("p",{key:"ch-"+x.id,className:"text-xs font-extrabold mt-3",style:{color:a.accent}},x.note))}const d=!!(done&&done[x.id]);acc.out.push(E("button",{key:x.id,onClick:()=>setOpen(x),className:"tap-fx w-full text-left rounded-2xl px-4 py-3 flex items-center justify-between gap-2",style:{backgroundColor:a.accentSoft,color:a.text}},E("span",{className:"font-bold text-sm"},x.title),E("span",{className:"text-xs font-extrabold"},d?"✓ Xong":"Học ▶")));return acc},{last:null,out:[]}).out,
         !isClosed&&hideDone&&shown.length===0&&E("p",{className:"text-xs opacity-70"},"Đã học hết các bài trong quyển này."));
     }));
 }
