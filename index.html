@@ -2290,7 +2290,7 @@ function InteractiveSentenceCard({
 
 const langOfWord=(v,nbs)=>{const nb=(nbs||[]).find(n=>n.id===nbOf(v));const s=nb&&nb.subject;return s==="Chinese"?"Chinese":s==="English"?"English":"Japanese"};
 /* ===================== LANTERN LANE · Lộ trình (nội dung từ Supabase) ===================== */
-const RM_LEVELS=[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"},{id:"hsk1",title:"HSK 1"},{id:"hsk2",title:"HSK 2"},{id:"hsk3",title:"HSK 3"},{id:"hsk4",title:"HSK 4"},{id:"hsk5",title:"HSK 5"},{id:"hsk6",title:"HSK 6"},{id:"a1",title:"A1"},{id:"a2",title:"A2"},{id:"b1",title:"B1"},{id:"b2",title:"B2"},{id:"c1",title:"C1"},{id:"c2",title:"C2"}];
+const RM_LANGS=[{id:"ja",title:"Tiếng Nhật"},{id:"zh",title:"Tiếng Trung"},{id:"en",title:"Tiếng Anh"}];RM_LV_BY_LANG={ja:[{id:"n5",title:"N5"},{id:"n4",title:"N4"},{id:"n3",title:"N3"},{id:"n2",title:"N2"},{id:"n1",title:"N1"}],zh:[{id:"hsk1",title:"HSK 1"},{id:"hsk2",title:"HSK 2"},{id:"hsk3",title:"HSK 3"},{id:"hsk4",title:"HSK 4"},{id:"hsk5",title:"HSK 5"},{id:"hsk6",title:"HSK 6"}],en:[{id:"a1",title:"A1"},{id:"a2",title:"A2"},{id:"b1",title:"B1"},{id:"b2",title:"B2"},{id:"c1",title:"C1"},{id:"c2",title:"C2"}]};
 const rmNorm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");
 function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
   const E=React.createElement;
@@ -2406,9 +2406,9 @@ function RmLesson({lesson:l,theme:a,done,doneMap,onDone,onBack}){
       paras.length?paras.map((p,k)=>E("p",{key:k,className:"text-sm leading-relaxed whitespace-pre-line"},p)):E("p",{className:"text-sm opacity-70"},"Bài này chưa có nội dung đọc.")),
     block);
 }
-function N2Roadmap({theme:a,done,onDone}){
+function N2Roadmap({theme:a,done,onDone,subject}){
   const E=React.createElement;
-  const[lv,setLv]=React.useState("n2");
+  const[lv,setLv]=React.useState("n2");const lg=subject==="Chinese"?"zh":subject==="English"?"en":"ja";
   const[books,setBooks]=React.useState([]);
   const[lessons,setLessons]=React.useState([]);
   const[loading,setLoading]=React.useState(true);
@@ -2430,11 +2430,11 @@ function N2Roadmap({theme:a,done,onDone}){
     return()=>{alive=false};
   },[]);
   if(open)return E(RmLesson,{lesson:open,theme:a,done:!!(done&&done[open.id]),doneMap:done||{},onDone:onDone,onBack:()=>setOpen(null)});
-  const lb=books.filter(b=>b.level===lv);
+  const lvE=(RM_LV_BY_LANG[lg]||[]).some(x=>x.id===lv)?lv:(RM_LV_BY_LANG[lg][0]||{}).id;const lb=books.filter(b=>b.level===lvE&&(b.lang||"ja")===lg);
   const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
   return E("div",{className:"max-w-3xl mx-auto space-y-6"},
     E("h2",{className:"text-2xl font-extrabold"},"Lantern Lane"),
-    E("div",{className:"flex flex-wrap gap-2"},RM_LEVELS.map(x=>E("button",{key:x.id,onClick:()=>setLv(x.id),className:"tap-fx px-4 py-2 rounded-xl text-xs font-extrabold",style:{backgroundColor:x.id===lv?a.accent:a.accentSoft,color:x.id===lv?"#fff":a.text}},x.title))),
+    E("div",{className:"flex flex-wrap gap-2"},(RM_LV_BY_LANG[lg]||[]).map(x=>E("button",{key:x.id,onClick:()=>setLv(x.id),className:"tap-fx px-4 py-2 rounded-xl text-xs font-extrabold",style:{backgroundColor:x.id===lvE?a.accent:a.accentSoft,color:x.id===lvE?"#fff":a.text}},x.title))),
     E("div",{className:"flex justify-end"},E("button",{onClick:()=>setHideDone(!hideDone),className:"tap-fx px-3 py-1.5 rounded-xl text-xs font-extrabold",style:{backgroundColor:a.accentSoft,color:a.text}},hideDone?"Hiện tất cả":"Ẩn bài đã học")),
     loading?E("p",{className:"text-sm opacity-70"},"Đang tải lộ trình…"):
     err?E("p",{className:"text-sm text-rose-600 font-bold"},err):
@@ -3845,7 +3845,7 @@ return H("div",{className:"min-h-screen bg-gradient-to-br from-[#F8DDE8] via-[#F
 
         w==="jstudy"&&React.createElement(JlptStudy,{jl:Ge,theme:n,stats:S.vstats||{},notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},reviewDone:S.jlptReviewDone||"",onReviewDone:day=>{const s0=de.current.prefs,O={...s0,jlptReviewDone:day};de.current.prefs=O,d(O),W({prefs:O})},onXp:ve}),
 
-        w==="roadmap"&&React.createElement(N2Roadmap,{theme:n,done:S.roadmapDone||{},onDone:ids=>{const add=Array.isArray(ids)?ids:[ids];const m={...(S.roadmapDone||{})};add.forEach(k=>{m[k]=true});fe({roadmapDone:m})}}),
+        w==="roadmap"&&React.createElement(N2Roadmap,{theme:n,subject:activeSubj,done:S.roadmapDone||{},onDone:ids=>{const add=Array.isArray(ids)?ids:[ids];const m={...(S.roadmapDone||{})};add.forEach(k=>{m[k]=true});fe({roadmapDone:m})}}),
 
         w==="jyt"&&React.createElement(YtListening,{theme:n,prefs:S,getPrefs:()=>de.current.prefs,save:patch=>{const s0=de.current.prefs,O={...s0,...patch};de.current.prefs=O,d(O),W({prefs:O})},onSaveUnifiedVocab:saveUnifiedFromYt,findDup:Ge.findDup,notebooks:E,nbViews:S.nbViews||{},onSaveNbViews:nv=>{const s0=de.current.prefs,O={...s0,nbViews:nv};de.current.prefs=O,d(O),W({prefs:O})},onXp:x=>ve(x),toast:K}),
 
