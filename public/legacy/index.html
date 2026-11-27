@@ -1236,12 +1236,7 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
     o.reviewCard(qObj.v.id,isCorrect?4:1);
     const curItem=sess.queue[sess.qi];
     const mode=curItem.steps[curItem.si];
-    const isTestStep=mode==="type_reading"||mode==="type_meaning"||mode==="type_word";
-    const updatedItem={
-      ...curItem,
-      failedThisPass:curItem.failedThisPass||!isCorrect,
-      testsPassedInAttempt2:(curItem.attempt>=2&&isTestStep&&isCorrect)?(curItem.testsPassedInAttempt2+1):curItem.testsPassedInAttempt2
-    };
+    const updatedItem=meoFeat.studyFlow.markAnswer(curItem,mode,isCorrect);
     const nextQueue=sess.queue.map((it,idx)=>idx===sess.qi?updatedItem:it);
     setSess(s=>({
       ...s,
@@ -1273,50 +1268,9 @@ function JlptStudy({jl:o,theme:a,notebooks:nbs=[],nbViews={},onSaveNbViews=()=>{
       // Vẫn còn bước tiếp theo cho từ này trong lượt hiện tại
       queueCopy[s.qi]={...curItem,si:nextSi};
     }else{
-      // Đã đi hết các bước của từ này trong lượt hiện tại
-      if(curItem.stage==="full"){
-        if(curItem.attempt>=2 && curItem.testsPassedInAttempt2>=3){
-          // Ở lần học lại thứ 2, học viên đã điền đúng cả 3 bài kiểm tra -> chỉ cần thêm 1 lần chọn Nhật->Việt và Việt->Nhật nữa là xong!
-          nextFailedList.push({
-            vocabId:curItem.vocabId,
-            attempt:curItem.attempt,
-            stage:"reinforce",
-            steps:[...REINFORCE_STEPS],
-            si:0,
-            failedThisPass:false,
-            testsPassedInAttempt2:3
-          });
-        }else if(curItem.failedThisPass){
-          // Sai ít nhất 1 lần bất kỳ -> quay lại học lại từ đầu từ vựng đó (1 Nhật->Việt, 1 Việt->Nhật, 3 bài kiểm tra)
-          nextFailedList.push({
-            vocabId:curItem.vocabId,
-            attempt:curItem.attempt+1,
-            stage:"full",
-            steps:[...FULL_STEPS],
-            si:0,
-            failedThisPass:false,
-            testsPassedInAttempt2:0
-          });
-        }
-      }else if(curItem.stage==="skim"){
-        if(curItem.failedThisPass){
-          // Lướt: từ nào chọn sai sẽ được hỏi lại ở vòng cuối (2 câu Nhật↔Việt)
-          nextFailedList.push({vocabId:curItem.vocabId,attempt:curItem.attempt+1,stage:"skim",steps:[...REINFORCE_STEPS],si:0,failedThisPass:false,testsPassedInAttempt2:0});
-        }
-      }else if(curItem.stage==="reinforce"){
-        if(curItem.failedThisPass){
-          // Nếu ở vòng củng cố Nhật->Việt / Việt->Nhật vẫn sai -> quay lại từ đầu 5 bước
-          nextFailedList.push({
-            vocabId:curItem.vocabId,
-            attempt:curItem.attempt+1,
-            stage:"full",
-            steps:[...FULL_STEPS],
-            si:0,
-            failedThisPass:false,
-            testsPassedInAttempt2:0
-          });
-        }
-      }
+      // Đã đi hết các bước của từ này trong lượt: đưa vào vòng lặp lại nếu cần
+      const retry=meoFeat.studyFlow.retryItemOf(curItem);
+      if(retry)nextFailedList.push(retry);
     }
 
     // Chế độ trộn câu hỏi: đi theo kế hoạch đã xáo thay vì lần lượt từng từ
