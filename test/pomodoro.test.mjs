@@ -39,7 +39,7 @@ t('legacy gọi đúng 3 chỗ qua meoFeat, không còn thẻ script cũ', () =>
 
 t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
   assert.ok(app.includes("import * as pomodoro from '../features/pomodoro.js';"));
-  assert.ok(app.includes('window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText };'));
+  assert.ok(app.includes('window.meobooksFeatures = { pomodoro, mochiPet, bantu, youtubeText, noitu, reader };'));
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
