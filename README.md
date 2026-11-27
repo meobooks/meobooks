@@ -137,3 +137,25 @@ và giao diện JLPT, Study, Notebook. Các phần đó cần kiểm trên tài 
 hàm phụ), và `src/features/srs.js` (dayKey, addDaysKey, idxOf, DAYN, sm2, planToday). Kiểm thử:
 `test/answer.test.mjs`, `test/srs.test.mjs`. Còn lại: phần gọi Supabase và realtime
 (useJlpt, sync, tải roadmap) và giao diện JLPT, Study, Notebook. Các phần này cần kiểm trên tài khoản thật.
+
+
+## Trạng thái (cập nhật 27/11/2026)
+
+### Đã kiểm chứng trên trình duyệt
+- Quên mật khẩu (email, đặt mật khẩu mới, liên kết hết hạn) và dọn dẹp (preconnect, bỏ sw.js)
+- Pomodoro, Mochi Pet, luyện nghe YouTube, BanTu, Nối từ, đọc sách và xem trang, Lantern Lane, SRS, kiểm đáp án
+
+### Chờ kiểm chứng
+- Bảng từ vựng tiếng Trung (VocabTable) trong bài Lantern Lane, cùng cấp HSK 7–9
+- Nút Pomodoro hiện trên màn hình rộng (z-50, nằm trên thanh bên)
+
+### Đã biết, chưa xử lý
+- **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu đã được ghi đè lên dữ liệu trên Supabase trong lúc đặt lại dữ liệu trình duyệt. Đang điều tra. Chưa dùng tài khoản thật để thử bản mới cho tới khi xong.
+- **Kho từ (bảng tiếng Trung):** ô tích chỉ lưu trên máy, chưa đồng bộ lên Supabase.
+- **Giao diện JLPT, Study, Notebook, và phần tải dữ liệu từ Supabase** vẫn nằm trong `public/legacy/index.html`. Cần kiểm trên tài khoản thử trước khi tách.
+- **Deploy:** môi trường `github-pages` phải cho phép nhánh `migration-vite`, và Pages phải dùng nguồn GitHub Actions.
+
+### Cách tách tính năng
+- Logic thuần nằm trong `src/features/`, được gắn lên `window.meobooksFeatures` ở `src/app/App.jsx`.
+- Legacy đọc các hàm này qua biến `meoFeat`, lấy từ `window.parent.meobooksFeatures`.
+- Mỗi module có bộ kiểm thử Node trong `test/`.
