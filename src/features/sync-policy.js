@@ -33,3 +33,12 @@ export const shouldMergeBeforeWrite = ({ baseline = null, remoteUpdatedAt = null
   if (!remoteUpdatedAt) return false;
   return parseStamp(remoteUpdatedAt) > parseStamp(baseline);
 };
+
+// Realtime: có áp dụng dòng vừa nhận từ máy chủ vào màn hình không.
+// - Chỉ áp khi không còn thay đổi chưa lưu (status 'saved'). Nếu đang có thay đổi chưa lưu thì bỏ qua,
+//   lần lưu kế tiếp sẽ hợp nhất với dòng này trước khi ghi.
+// - Chỉ áp khi dòng mới hơn mốc đã biết. Sự kiện đến muộn (cũ hơn hoặc bằng mốc) không được ghi đè dữ liệu mới hơn.
+export const shouldApplyRealtime = ({ status = 'saved', remoteUpdatedAt = null, baseline = null } = {}) => {
+  if (status !== 'saved' || !remoteUpdatedAt) return false;
+  return parseStamp(remoteUpdatedAt) > parseStamp(baseline);
+};

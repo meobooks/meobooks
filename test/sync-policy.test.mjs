@@ -70,11 +70,38 @@ t('shouldMergeBeforeWrite: chưa biết mốc nhưng máy chủ đã có dữ li
   assert.equal(P.shouldMergeBeforeWrite({ baseline: null, remoteUpdatedAt: '2026-11-27 11:00:00.000+00' }), true);
 });
 
+t('shouldApplyRealtime: chỉ áp khi trạng thái đã lưu và dòng mới hơn mốc', () => {
+  assert.equal(P.shouldApplyRealtime({ status: 'saved', remoteUpdatedAt: '2026-11-27 11:00:00.000+00', baseline: '2026-11-27T10:00:00Z' }), true);
+});
+
+t('shouldApplyRealtime: đang có thay đổi chưa lưu thì bỏ qua (lần lưu sau sẽ hợp nhất)', () => {
+  for (const status of ['saving', 'error', 'offline']) {
+    assert.equal(P.shouldApplyRealtime({ status, remoteUpdatedAt: '2026-11-27 11:00:00.000+00', baseline: '2026-11-27T10:00:00Z' }), false, status);
+  }
+});
+
+t('shouldApplyRealtime: sự kiện cũ đến muộn (cũ hơn hoặc bằng mốc) không ghi đè', () => {
+  assert.equal(P.shouldApplyRealtime({ status: 'saved', remoteUpdatedAt: '2026-11-27 09:00:00.000+00', baseline: '2026-11-27T10:00:00Z' }), false);
+  // Tiếng vọng của chính lần ghi vừa rồi: cùng mốc thì bỏ qua
+  assert.equal(P.shouldApplyRealtime({ status: 'saved', remoteUpdatedAt: '2026-11-27 10:00:00.000+00', baseline: '2026-11-27T10:00:00Z' }), false);
+});
+
+t('shouldApplyRealtime: thiếu dòng hoặc thiếu updated_at thì bỏ qua', () => {
+  assert.equal(P.shouldApplyRealtime({ status: 'saved', remoteUpdatedAt: null, baseline: null }), false);
+});
+
 t('legacy: dùng module cho quyết định tải và lưu', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('meoFeat.syncPolicy.cloudLoadPlan('));
   assert.ok(legacy.includes('meoFeat.syncPolicy.saveGate('));
   assert.ok(!legacy.includes('if(!meoCloudLoaded){p("error")'));
+});
+
+t('legacy: realtime dùng shouldApplyRealtime, cập nhật mốc sau khi áp dụng, không còn dùng shouldApplyRemote', () => {
+  const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+  assert.ok(legacy.includes('meoFeat.syncPolicy.shouldApplyRealtime('));
+  assert.ok(legacy.includes('meoBaseStamp=row.updated_at'));
+  assert.ok(!legacy.includes('SY.shouldApplyRemote('));
 });
 
 console.log(`\n${pass} kiểm thử đạt`);
