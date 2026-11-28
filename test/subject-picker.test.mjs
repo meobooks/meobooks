@@ -16,7 +16,7 @@ t('src/ui/subject-picker.js xuất makeSubjectPicker nhận lvlInfo và SUBJECT_
 t('src/ui/index.js gom makeSubjectPicker', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeSubjectPicker } from './subject-picker.js';"));
-  assert.ok(s.includes('makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer };'));
+  assert.ok(s.includes('makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan };'));
 });
 
 t('legacy: SubjectPicker lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

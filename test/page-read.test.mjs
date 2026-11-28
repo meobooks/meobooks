@@ -16,7 +16,7 @@ t('src/ui/page-read.js xuất makePageRead nhận các phụ thuộc đã truy�
 t('src/ui/index.js gom makePageRead', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makePageRead } from './page-read.js';"));
-  assert.ok(s.includes('makePageRead, makeBookViewer };'));
+  assert.ok(s.includes('makePageRead, makeBookViewer, makeSmartPlan };'));
 });
 
 t('legacy: PageRead lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
