@@ -63,8 +63,9 @@ t('retryItemOf (reinforce): sai thì quay lại 5 bước đầy đủ', () => {
 });
 
 t('legacy: dùng module cho markAnswer và retryItemOf', () => {
-  const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.studyFlow.markAnswer(curItem,mode,isCorrect)'));
+  const legacy = ['../public/legacy/index.html', '../src/ui/jlpt-study.js', '../src/ui/jlpt-hook.js', '../src/ui/jlpt-game.js']
+    .map((p) => readFileSync(new URL(p, import.meta.url), 'utf8')).join('\n'); // code JLPT đã tách nằm trong src/ui
+  assert.ok((legacy + readFileSync(new URL('../src/ui/jlpt-study.js', import.meta.url), 'utf8')).includes('meoFeat.studyFlow.markAnswer(curItem,mode,isCorrect)'));
   assert.ok(legacy.includes('meoFeat.studyFlow.retryItemOf(curItem)'));
   assert.ok(!legacy.includes('const isTestStep=mode==='));
 });

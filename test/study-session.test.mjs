@@ -65,8 +65,9 @@ t('buildSkimSession: 2 bước mỗi từ, lượt 5 từ, kind skim', () => {
 });
 
 t('legacy: dùng module cho due, viewProgress và hai hàm khởi tạo phiên', () => {
-  const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.studySession.isDue(N,o.srs,today)'));
+  const legacy = ['../public/legacy/index.html', '../src/ui/jlpt-study.js', '../src/ui/jlpt-hook.js', '../src/ui/jlpt-game.js']
+    .map((p) => readFileSync(new URL(p, import.meta.url), 'utf8')).join('\n'); // code JLPT đã tách nằm trong src/ui
+  assert.ok((legacy + readFileSync(new URL('../src/ui/jlpt-study.js', import.meta.url), 'utf8')).includes('meoFeat.studySession.isDue(N,o.srs,today)'));
   assert.ok(legacy.includes('meoFeat.studySession.viewProgress(view,o.vocab)'));
   assert.ok(legacy.includes('meoFeat.studySession.buildSmartSession('));
   assert.ok(legacy.includes('meoFeat.studySession.buildSkimSession('));
