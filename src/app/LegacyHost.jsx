@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 
 // Giai đoạn 1 (bỏ iframe): nạp nguyên bản app cũ (public/legacy/index.html) vào chính trang này.
 // Legacy tự nạp React UMD riêng (window.React) và không dùng component nào của app mới,
@@ -35,6 +36,11 @@ export default function LegacyHost({ url }) {
   useEffect(() => {
     if (started) return;
     started = true;
+
+    // App cũ dùng React và ReactDOM toàn cục. Gán bản của Vite (cùng phiên bản 18.3.1 như trước)
+    // để app cũ và các component mới dùng chung một React.
+    window.React = React;
+    window.ReactDOM = { createRoot };
 
     (async () => {
       const abs = (v) => new URL(v, new URL(url, window.location.href)).href;

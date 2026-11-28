@@ -27,4 +27,12 @@ t('legacy: phần tử gốc đổi thành legacy-root để không trùng #root
   assert.ok(!legacy.includes('getElementById("root")'));
 });
 
+t('bước 3: legacy không tải React từ CDN; LegacyHost gán React của Vite làm window.React', () => {
+  const legacy = read('public/legacy/index.html');
+  assert.ok(!legacy.includes('cdn.jsdelivr.net/npm/react'));
+  const h = read('src/app/LegacyHost.jsx');
+  assert.ok(h.includes('window.React = React;'));
+  assert.ok(h.includes('window.ReactDOM = { createRoot };'));
+});
+
 console.log(`\n${pass} kiểm thử đạt`);
