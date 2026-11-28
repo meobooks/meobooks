@@ -1,5 +1,6 @@
 // Kiểm thử public/legacy/services.js (cầu nối giai đoạn 2).
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import vm from 'node:vm';
 import * as DM from '../src/features/data-merge.js';
 
@@ -97,7 +98,7 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check(legacy.includes('supabase=(window.meoSupabase=isSupabaseConfigured?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null,window.meobooksServices&&window.meobooksServices.setClient(window.meoSupabase),window.meoSupabase),'), 'legacy: gắn client cho services, giá trị vẫn là client');
   check(!legacy.includes('supabase.auth.'), 'legacy: không còn lời gọi supabase.auth trực tiếp');
   const authCalls = ['meobooksServices.auth.getSession().then(', 'const e=meobooksServices.auth.onAuthStateChange(', 'await meobooksServices.auth.signUp({email:s,password:r,displayName:t})', 'await meobooksServices.auth.signIn({email:s,password:r})', 'supabase&&await meobooksServices.auth.signOut()', 'await meobooksServices.auth.resetPassword(s)'];
-  check(authCalls.every((c) => legacy.includes(c)), 'legacy: đủ 6 lời gọi auth qua meobooksServices');
+  check(authCalls.every((c) => appSrc.includes(c)), 'legacy: đủ 6 lời gọi auth qua meobooksServices');
 }
 
 // 6) Lưu trữ cục bộ: bt_best_* (điểm cao nhất trò Bảng Từ)
@@ -183,8 +184,8 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // 11) Legacy: meobooks_subjects_* đã nối qua localStore
 {
   check(!legacy.includes('meobooks_subjects_'), 'legacy: không còn truy cập trực tiếp khóa meobooks_subjects_');
-  check(legacy.includes('window.meobooksServices.localStore.getSubjects(o.id)'), 'legacy: đọc môn qua getSubjects');
-  check(legacy.includes('window.meobooksServices.localStore.setSubjects(o.id,list)'), 'legacy: ghi môn qua setSubjects');
+  check(appSrc.includes('window.meobooksServices.localStore.getSubjects(o.id)'), 'legacy: đọc môn qua getSubjects');
+  check(appSrc.includes('window.meobooksServices.localStore.setSubjects(o.id,list)'), 'legacy: ghi môn qua setSubjects');
 }
 
 // 12) Lưu trữ cục bộ: các khóa còn lại (mochi_local, jlpt_local, phiên học, thông báo, người dùng cuối, dirty)
@@ -282,10 +283,10 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // 17) Legacy và shell: màn hình đặt mật khẩu mới đã được nối
 {
   const appJsx = readFileSync(new URL('../src/app/App.jsx', import.meta.url), 'utf8');
-  check(legacy.includes('meobooksServices.auth.isRecoveryBoot()') && legacy.includes('t==="PASSWORD_RECOVERY"&&setRecovery(!0)'), 'legacy: bật màn đặt mật khẩu khi mở từ liên kết hoặc nhận sự kiện PASSWORD_RECOVERY');
-  check(legacy.includes('if(recovery)return(()=>') && legacy.indexOf('if(recovery)return') < legacy.indexOf('if(!o)return(()=>{const H=React.createElement,FEATS='), 'legacy: màn đặt mật khẩu được kiểm tra trước màn đăng nhập');
-  check(legacy.includes('meobooksServices.auth.updatePassword(rcForm.pw)'), 'legacy: màn đặt mật khẩu gọi auth.updatePassword');
-  check(legacy.includes('[R,j]=useState(()=>meobooksServices.auth.bootAuthError())'), 'legacy: liên kết hỏng/hết hạn hiện thông báo ở khung đăng nhập');
+  check(appSrc.includes('meobooksServices.auth.isRecoveryBoot()') && appSrc.includes('t==="PASSWORD_RECOVERY"&&setRecovery(!0)'), 'legacy: bật màn đặt mật khẩu khi mở từ liên kết hoặc nhận sự kiện PASSWORD_RECOVERY');
+  check(appSrc.includes('if(recovery)return(()=>') && appSrc.indexOf('if(recovery)return') < appSrc.indexOf('if(!o)return(()=>{const H=React.createElement,FEATS='), 'legacy: màn đặt mật khẩu được kiểm tra trước màn đăng nhập');
+  check(appSrc.includes('meobooksServices.auth.updatePassword(rcForm.pw)'), 'legacy: màn đặt mật khẩu gọi auth.updatePassword');
+  check(appSrc.includes('[R,j]=useState(()=>meobooksServices.auth.bootAuthError())'), 'legacy: liên kết hỏng/hết hạn hiện thông báo ở khung đăng nhập');
   const hostJsx = readFileSync(new URL('../src/app/LegacyHost.jsx', import.meta.url), 'utf8');
   check(hostJsx.includes('AUTH_HASH') && hostJsx.includes('replaceState'), 'shell: LegacyHost xóa phần # nhạy cảm khỏi thanh địa chỉ sau khi legacy nạp xong');
   const re = /^#(?:.*&)?(?:access_token|error|error_code|type)=/;
@@ -368,9 +369,9 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check(!legacy.includes('mochi_local_') && !legacy.includes('mochi_dirty_') && !legacy.includes('jlpt_local_'), 'legacy: không còn khóa mochi_local_/mochi_dirty_/jlpt_local_ viết tay');
   check(!legacy.includes('mochi_last_user') && !legacy.includes('mochi_notif') && !legacy.includes('mochi_ai_key') && !legacy.includes('mochi_smart_session_v2'), 'legacy: không còn khóa last_user/notif/ai_key/smart_session viết tay');
   check(!legacy.includes('from("mochi_user_data")') && !legacy.includes('supabase.channel('), 'legacy: không còn gọi bảng mochi_user_data/kênh realtime trực tiếp');
-  check(legacy.includes('sync.insertRow(e.id,O,stampI)') && legacy.includes('sync.fetchRow(') && legacy.includes('sync.upsertRow(') && legacy.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
-  check((legacy.match(/sync\.upsertRow\(/g) || []).length === 2 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 3, 'legacy: 2 chỗ upsertRow, 3 chỗ fetchRow (tải, kiểm tra trước khi ghi, thử lại)');
+  check(appSrc.includes('sync.insertRow(e.id,O,stampI)') && appSrc.includes('sync.fetchRow(') && appSrc.includes('sync.upsertRow(') && appSrc.includes('sync.subscribeRealtime('), 'legacy: dùng fetchRow/upsertRow/subscribeRealtime');
+  check((appSrc.match(/sync\.upsertRow\(/g) || []).length === 2 && (appSrc.match(/sync\.fetchRow\(/g) || []).length === 3, 'legacy: 2 chỗ upsertRow, 3 chỗ fetchRow (tải, kiểm tra trước khi ghi, thử lại)');
   check(!/sync\.upsertRow\(e\.id,O\)/.test(legacy), 'legacy: không ghi dữ liệu mặc định lên tài khoản khi chưa tải được');
-  check(legacy.includes('meoCloudLoaded=true') && legacy.includes('cloudLoaded:meoCloudLoaded'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
+  check(appSrc.includes('meoCloudLoaded=true') && appSrc.includes('cloudLoaded:meoCloudLoaded'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
   check(banTuSrc.includes('getRaw(k,d)') && banTuSrc.includes('setRaw(k,v)'), 'bantu: lsGet/lsSet chuyển sang getRaw/setRaw');
 }

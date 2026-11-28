@@ -16,7 +16,7 @@ t('src/ui/ink-layer.js xuất makeInkLayer nhận INK_COLORS và drawStroke', ()
 t('src/ui/index.js gom makeInkLayer', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeInkLayer } from './ink-layer.js';"));
-  assert.ok(s.includes('makeInkLayer, makeBanTu, makeYtListening };'));
+  assert.ok(s.includes('makeInkLayer, makeBanTu, makeYtListening, makeApp };'));
 });
 
 t('legacy: InkLayer lấy từ meoFeat.ui, drawStroke truyền qua hàm bọc, không còn định nghĩa lại', () => {

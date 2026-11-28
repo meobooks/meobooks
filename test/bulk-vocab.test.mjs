@@ -1,5 +1,6 @@
 // Kiểm thử src/features/bulk-vocab.js (phân tích nhập hàng loạt từ vựng tách từ legacy).
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import assert from 'node:assert/strict';
 import * as B from '../src/features/bulk-vocab.js';
 
@@ -49,7 +50,7 @@ t('legacy: dùng module cho nhập hàng loạt JLPT và nhập dán', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   const jlptVocabSrc = readFileSync(new URL('../src/ui/jlpt-vocab.js', import.meta.url), 'utf8');
   assert.ok(jlptVocabSrc.includes('meoFeat.bulkVocab.parseBulkLines(bulk,bulkNb||firstNb)'));
-  assert.ok(legacy.includes('meoFeat.bulkVocab.parseVocabPaste(Ve)'));
+  assert.ok(appSrc.includes('meoFeat.bulkVocab.parseVocabPaste(Ve)'));
 });
 
 console.log(`\n${pass} kiểm thử đạt`);

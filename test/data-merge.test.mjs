@@ -1,5 +1,6 @@
 // Kiểm thử src/features/data-merge.js (hợp nhất dữ liệu máy và tài khoản, tách từ legacy).
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import assert from 'node:assert/strict';
 import * as M from '../src/features/data-merge.js';
 
@@ -118,8 +119,8 @@ t('tombsAfterNbViews: view bị bỏ khỏi danh sách được đánh dấu xó
 t('legacy: dùng module cho stampOf, mergeList và mergeData', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('mergeData=meoFeat.dataMerge.mergeData'));
-  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"pages"'));
-  assert.ok(legacy.includes('meoFeat.dataMerge.tombsAfterNbViews(s0,nv,Date.now())'));
+  assert.ok(appSrc.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"pages"'));
+  assert.ok(appSrc.includes('meoFeat.dataMerge.tombsAfterNbViews(s0,nv,Date.now())'));
   assert.ok(!legacy.includes('mergeData=(o,a)=>{var v,A;'));
 });
 
@@ -144,9 +145,9 @@ t('tombstone: sổ tay được sửa sau thời điểm xóa thì được gi�
 
 t('legacy: xóa sổ tay và mục tiêu đều ghi tombstone', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[nbEd.id]'));
-  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[e.id]'));
-  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"tasks",[e.id]'));
+  assert.ok(appSrc.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[nbEd.id]'));
+  assert.ok(appSrc.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[e.id]'));
+  assert.ok(appSrc.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"tasks",[e.id]'));
 });
 
 console.log(`\n${pass} kiểm thử đạt`);

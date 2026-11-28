@@ -1,5 +1,6 @@
 // Kiểm thử src/features/sync-policy.js (quyết định tải và lưu đồng bộ, tách từ legacy).
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import assert from 'node:assert/strict';
 import * as P from '../src/features/sync-policy.js';
 
@@ -92,15 +93,15 @@ t('shouldApplyRealtime: thiếu dòng hoặc thiếu updated_at thì bỏ qua', 
 
 t('legacy: dùng module cho quyết định tải và lưu', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.syncPolicy.cloudLoadPlan('));
-  assert.ok(legacy.includes('meoFeat.syncPolicy.saveGate('));
+  assert.ok(appSrc.includes('meoFeat.syncPolicy.cloudLoadPlan('));
+  assert.ok(appSrc.includes('meoFeat.syncPolicy.saveGate('));
   assert.ok(!legacy.includes('if(!meoCloudLoaded){p("error")'));
 });
 
 t('legacy: realtime dùng shouldApplyRealtime, cập nhật mốc sau khi áp dụng, không còn dùng shouldApplyRemote', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.syncPolicy.shouldApplyRealtime('));
-  assert.ok(legacy.includes('meoBaseStamp=row.updated_at'));
+  assert.ok(appSrc.includes('meoFeat.syncPolicy.shouldApplyRealtime('));
+  assert.ok(appSrc.includes('meoBaseStamp=row.updated_at'));
   assert.ok(!legacy.includes('SY.shouldApplyRemote('));
 });
 
