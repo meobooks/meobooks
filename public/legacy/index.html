@@ -913,22 +913,7 @@ function PageRead({page:p,defFont,onSyncVocab,compact}){
     hasInk?E(InkView,{ink:p.ink}):null,
     empty&&E("p",{className:"opacity-60 italic text-sm"},"Trang này chưa có nội dung. Bấm Sửa để ghi chép."));
 }
-function ReadView({page:k,theme:n,defFont,notebooks,onBack,onEdit,onBook,onFav,onSyncVocab}){
-  const E=React.createElement;
-  const nb=notebooks.find(x=>x.id===k.notebookId);
-  const b=(label,fn,st,cls)=>E("button",{onClick:fn,style:st||{backgroundColor:n.accentSoft},className:"tap-fx px-3 py-1.5 rounded-xl text-xs font-extrabold "+(cls||"")},label);
-  return E("div",{className:"space-y-4"},
-    E("div",{className:"no-print flex flex-wrap items-center justify-between gap-3 p-4 rounded-3xl border",style:{backgroundColor:n.card,borderColor:n.border}},
-      E("div",{className:"flex items-center gap-2"},b("← Về sổ tay",onBack),E("span",{className:"text-xs font-bold opacity-70"},nb?cleanT(nb.title):"")),
-      E("div",{className:"flex flex-wrap items-center gap-2"},
-        E("span",{className:"text-[11px] font-extrabold px-2.5 py-1 rounded-full",style:{backgroundColor:n.accentSoft}},"Chế độ đọc"),
-        k.type==="vocabulary"&&(k.vocabRows||[]).length>0&&b("Đồng bộ vào Kho Từ Vựng",()=>onSyncVocab(),{backgroundColor:"#FFF0C9",color:"#5E503F"}),
-        b("Mở sách (lật trang)",onBook),
-        b("PDF",()=>window.print()),
-        b(k.favorite?"★ Yêu thích":"☆ Yêu thích",onFav),
-        b("Sửa trang",onEdit,{backgroundColor:n.accent},"text-white"))),
-    E(PageRead,{page:k,defFont,onSyncVocab:k.type==="vocabulary"?onSyncVocab:null}));
-}
+const ReadView=meoFeat.ui.makeReadView({cleanT,PageRead});
 function BookViewer({title,color,pages,startId,theme,defFont,onClose,onEdit}){
   const E=React.createElement;
   const[vw,setVw]=useState(window.innerWidth),[vh,setVh]=useState(window.innerHeight);
