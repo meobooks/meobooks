@@ -154,8 +154,8 @@ hàm phụ), và `src/features/srs.js` (dayKey, addDaysKey, idxOf, DAYN, sm2, pl
 
 ### Đã biết, chưa xử lý
 - **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu từng ghi đè lên dữ liệu trên Supabase khi đặt lại dữ liệu trình duyệt. Đã thêm chốt chặn: không lưu lên máy chủ khi chưa tải xong dữ liệu, và tài khoản chưa có dòng thì chỉ tạo bằng insert, không ghi đè.
-- **Realtime:** `subscribeRealtime` ghi đè trạng thái cục bộ bằng dữ liệu từ xa, chưa hợp nhất như luồng tải và lưu. Có thể mất thay đổi chưa lưu.
-- **Xóa:** chỉ trang và view có tombstone (không quay lại khi hợp nhất). Các thao tác xóa khác chưa có cơ chế này.
+- **Realtime:** chỉ áp dữ liệu từ xa khi không còn thay đổi chưa lưu và dữ liệu mới hơn mốc đã biết. Không hợp nhất bằng mergeData vì sổ tay, flashcard và mục tiêu cũ chưa có tombstone đầy đủ.
+- **Xóa:** trang, view, sổ tay và mục tiêu có tombstone (không quay lại khi hợp nhất). Flashcard chưa có đường xóa trong giao diện cũ nên chưa có tombstone.
 - **Đã tách logic JLPT và đồng bộ** sang `src/features/` (buổi học, câu hỏi, tiến độ, từ vựng, nhập hàng loạt, hợp nhất dữ liệu, dữ liệu mặc định, quyết định tải/lưu). Phần còn lại vẫn trong `public/legacy/index.html`: giao diện React, và các lệnh gọi Supabase (`fetchRow`, `upsertRow`, `insertRow`). Cần kiểm trên tài khoản thử trước khi tách tiếp.
 - **Deploy:** môi trường `github-pages` phải cho phép nhánh `migration-vite`, và Pages phải dùng nguồn GitHub Actions.
 
