@@ -55,10 +55,11 @@ t('liveDuplicate: tìm trùng theo kanji, bỏ qua chính bản ghi đang sửa'
 
 t('legacy: dùng module cho lọc, gợi ý, đếm và kiểm tra trùng', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.vocabList.filterVocab('));
-  assert.ok(legacy.includes('meoFeat.vocabList.suggestionsFor(o.vocab,u,5)'));
-  assert.ok(legacy.includes('meoFeat.vocabList.statusCounts(o.vocab)'));
-  assert.ok(legacy.includes('meoFeat.vocabList.liveDuplicate(u,R,o.findDup)'));
+  const jlptVocabSrc = readFileSync(new URL('../src/ui/jlpt-vocab.js', import.meta.url), 'utf8');
+  assert.ok(jlptVocabSrc.includes('meoFeat.vocabList.filterVocab('));
+  assert.ok(jlptVocabSrc.includes('meoFeat.vocabList.suggestionsFor(o.vocab,u,5)'));
+  assert.ok(jlptVocabSrc.includes('meoFeat.vocabList.statusCounts(o.vocab)'));
+  assert.ok(jlptVocabSrc.includes('meoFeat.vocabList.liveDuplicate(u,R,o.findDup)'));
 });
 
 console.log(`\n${pass} kiểm thử đạt`);
