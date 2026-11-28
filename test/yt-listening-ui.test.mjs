@@ -14,7 +14,7 @@ t('src/ui/yt-listening.js xuất makeYtListening với đầy đủ dependency',
 
 t('src/ui/index.js gom makeYtListening', () => {
   assert.ok(idx.includes("import { makeYtListening } from './yt-listening.js';"));
-  assert.ok(idx.includes('makeBanTu, makeYtListening, makeApp };'));
+  assert.ok(idx.includes('makeBanTu, makeYtListening, makeApp, makeNbDeckPicker };'));
 });
 
 t('legacy dùng makeYtListening thay cho function YtListening cũ', () => {

@@ -17,7 +17,7 @@ t('src/ui/interactive-sentence-card.js xuất InteractiveSentenceCard và giữ 
 t('src/ui/index.js gom InteractiveSentenceCard', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { InteractiveSentenceCard } from './interactive-sentence-card.js';"));
-  assert.ok(s.includes('InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening, makeApp };'));
+  assert.ok(s.includes('InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening, makeApp, makeNbDeckPicker };'));
 });
 
 t('legacy: InteractiveSentenceCard lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

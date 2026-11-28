@@ -14,7 +14,7 @@ t('src/ui/bantu.js xuất makeBanTu với đầy đủ dependency', () => {
 
 t('src/ui/index.js gom makeBanTu', () => {
   assert.ok(idx.includes("import { makeBanTu } from './bantu.js';"));
-  assert.ok(idx.includes('makeInkLayer, makeBanTu, makeYtListening, makeApp };'));
+  assert.ok(idx.includes('makeInkLayer, makeBanTu, makeYtListening, makeApp, makeNbDeckPicker };'));
 });
 
 t('legacy dùng makeBanTu thay cho function BanTu cũ', () => {

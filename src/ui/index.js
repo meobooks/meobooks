@@ -23,5 +23,6 @@ import { makeInkLayer } from './ink-layer.js';
 import { makeBanTu } from './bantu.js';
 import { makeYtListening } from './yt-listening.js';
 import { makeApp } from './app.js';
+import { makeNbDeckPicker } from './nb-deck-picker.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening, makeApp };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening, makeApp, makeNbDeckPicker };
