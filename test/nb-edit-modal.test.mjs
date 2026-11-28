@@ -16,7 +16,7 @@ t('src/ui/nb-edit-modal.js xuất makeNbEditModal nhận NB_COLORS và cleanT', 
 t('src/ui/index.js gom makeNbEditModal', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeNbEditModal } from './nb-edit-modal.js';"));
-  assert.ok(s.includes('makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker };'));
+  assert.ok(s.includes('makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable };'));
 });
 
 t('legacy: NbEditModal lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

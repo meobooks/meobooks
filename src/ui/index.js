@@ -9,5 +9,6 @@ import { makeNbEditModal } from './nb-edit-modal.js';
 import { makeN2Roadmap } from './n2-roadmap.js';
 import { makePomodoroWidget } from './pomodoro-widget.js';
 import { makeSubjectPicker } from './subject-picker.js';
+import { VocabTable } from './vocab-table.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable };

@@ -58,8 +58,9 @@ assert.equal(parseVocabLines(''), null);
 assert.equal(parseVocabLines('1|爱|ài|yêu'), null); // thiếu cột
 console.log('ok - parseVocabLines nhận đúng bảng và bỏ qua văn bản thường');
 assert.equal(legacyRM.includes('meoFeat.roadmap.parseVocabLines(l.content)'), true);
-assert.equal(legacyRM.includes('function VocabTable('), true);
-console.log('ok - legacy có VocabTable và dùng parseVocabLines');
+const vocabTableSrc = readFileSync(new URL('../src/ui/vocab-table.js', import.meta.url), 'utf8');
+assert.equal(vocabTableSrc.includes('export function VocabTable('), true);
+console.log('ok - VocabTable nằm trong src/ui/vocab-table.js và legacy dùng parseVocabLines');
 
 // Kho từ: tick mở chọn sổ, bỏ tick xóa khỏi kho; App gắn khoAdd/khoRemove
 const legacyKho = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
