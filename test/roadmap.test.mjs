@@ -25,9 +25,10 @@ t('booksFor: lọc theo cấp và ngôn ngữ, mặc định ja', () => {
   assert.deepEqual(RM.booksFor(books, 'n5', 'zh').map((b) => b.id), [2]);
 });
 
-t('legacy dùng roadmap qua meoFeat', () => {
-  assert.equal(legacy.includes('meoFeat.roadmap.resolveLevel(RM_LV_BY_LANG[lg],lv)'), true);
-  assert.equal(legacy.includes('meoFeat.roadmap.booksFor(books,lvE,lg)'), true);
+t('N2Roadmap dùng roadmap qua meoFeat (nay nằm trong src/ui/n2-roadmap.js)', () => {
+  const n2 = readFileSync(new URL('../src/ui/n2-roadmap.js', import.meta.url), 'utf8');
+  assert.equal(n2.includes('meoFeat.roadmap.resolveLevel(RM_LV_BY_LANG[lg],lv)'), true);
+  assert.equal(n2.includes('meoFeat.roadmap.booksFor(books,lvE,lg)'), true);
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
