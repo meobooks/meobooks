@@ -10,5 +10,6 @@ import { makeN2Roadmap } from './n2-roadmap.js';
 import { makePomodoroWidget } from './pomodoro-widget.js';
 import { makeSubjectPicker } from './subject-picker.js';
 import { VocabTable } from './vocab-table.js';
+import { InteractiveSentenceCard } from './interactive-sentence-card.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard };
