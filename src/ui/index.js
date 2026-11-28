@@ -5,5 +5,6 @@ import { makeUseJlpt } from './jlpt-hook.js';
 import { makeJlptStudy } from './jlpt-study.js';
 import { drawStroke, InkView } from './ink.js';
 import { makeReadView } from './read-view.js';
+import { makeNbEditModal } from './nb-edit-modal.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal };
