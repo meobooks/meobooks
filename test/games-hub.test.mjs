@@ -16,7 +16,7 @@ t('src/ui/games-hub.js xuất makeGamesHub nhận BanTu, NoiTu, MochiMascot', ()
 t('src/ui/index.js gom makeGamesHub', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeGamesHub } from './games-hub.js';"));
-  assert.ok(s.includes('makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet };'));
+  assert.ok(s.includes('makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson };'));
 });
 
 t('legacy: GamesHub lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
