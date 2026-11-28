@@ -14,7 +14,7 @@ t('jlpt-study.js xuất makeJlptStudy và nhận đủ phụ thuộc', () => {
 });
 
 t('ui/index.js đưa makeJlptStudy vào ui', () => {
-  assert.ok(read('src/ui/index.js').includes('makeUseJlpt, makeJlptStudy }'));
+  assert.ok(read('src/ui/index.js').includes('makeUseJlpt, makeJlptStudy, drawStroke, InkView }'));
 });
 
 t('legacy: JlptStudy tạo từ meoFeat.ui.makeJlptStudy, không còn định nghĩa cũ', () => {
