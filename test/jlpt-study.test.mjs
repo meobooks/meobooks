@@ -14,7 +14,7 @@ t('jlpt-study.js xuất makeJlptStudy và nhận đủ phụ thuộc', () => {
 });
 
 t('ui/index.js đưa makeJlptStudy vào ui', () => {
-  assert.ok(read('src/ui/index.js').includes('makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet }'));
+  assert.ok(read('src/ui/index.js').includes('makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson }'));
 });
 
 t('legacy: JlptStudy tạo từ meoFeat.ui.makeJlptStudy, không còn định nghĩa cũ', () => {

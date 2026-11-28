@@ -57,7 +57,7 @@ assert.equal(parseVocabLines('Đây là đoạn văn bình thường.'), null);
 assert.equal(parseVocabLines(''), null);
 assert.equal(parseVocabLines('1|爱|ài|yêu'), null); // thiếu cột
 console.log('ok - parseVocabLines nhận đúng bảng và bỏ qua văn bản thường');
-assert.equal(legacyRM.includes('meoFeat.roadmap.parseVocabLines(l.content)'), true);
+assert.equal(readFileSync(new URL('../src/ui/rm-lesson.js', import.meta.url), 'utf8').includes('meoFeat.roadmap.parseVocabLines(l.content)'), true);
 const vocabTableSrc = readFileSync(new URL('../src/ui/vocab-table.js', import.meta.url), 'utf8');
 assert.equal(vocabTableSrc.includes('export function VocabTable('), true);
 console.log('ok - VocabTable nằm trong src/ui/vocab-table.js và legacy dùng parseVocabLines');
@@ -67,5 +67,5 @@ const legacyKho = readFileSync(new URL('../public/legacy/index.html', import.met
 assert.equal(legacyKho.includes('khoAdd:khoAddFn,khoRemove:khoRemoveFn,notebooks:E'), true);
 assert.equal(legacyKho.includes('const khoAddFn=async(row,nbId)=>{'), true);
 assert.equal(legacyKho.includes('await Ge.deleteVocab(id)'), true);
-assert.equal(legacyKho.includes('khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks'), true);
+assert.equal(readFileSync(new URL('../src/ui/n2-roadmap.js', import.meta.url), 'utf8').includes('khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks'), true);
 console.log('ok - kho từ được nối từ App xuống bảng');
