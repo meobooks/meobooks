@@ -83,7 +83,7 @@
   // Đánh dấu xóa (tombstone) trong prefs.tombs — logic giống src/features/data-merge.js
   function mergeTombs(x, y) {
     const out = {};
-    ['pages', 'nbViews'].forEach((k) => {
+    ['pages', 'nbViews', 'notebooks', 'tasks'].forEach((k) => {
       const m = Object.assign({}, ((x || {})[k]) || {});
       Object.entries(((y || {})[k]) || {}).forEach(([id, t]) => {
         if (!m[id] || (Date.parse(t) || 0) > (Date.parse(m[id]) || 0)) m[id] = t;
@@ -137,10 +137,10 @@
     Object.keys(mergedNbViews).forEach((k) => { mergedNbViews[k] = applyTombs(mergedNbViews[k], tombs.nbViews); });
     return {
       prefs: Object.assign({}, a.prefs || {}, o.prefs || {}, { activity, nbViews: mergedNbViews, vstats: mergedVstats, tombs }),
-      notebooks: mergeList(o.notebooks, a.notebooks).sort(byCreated),
+      notebooks: applyTombs(mergeList(o.notebooks, a.notebooks).sort(byCreated), tombs.notebooks),
       pages: applyTombs(mergeList(o.pages, a.pages).sort(byCreated), tombs.pages),
       flashcards: mergeList(o.flashcards, a.flashcards),
-      tasks: mergeList(o.tasks, a.tasks),
+      tasks: applyTombs(mergeList(o.tasks, a.tasks), tombs.tasks),
     };
   }
 

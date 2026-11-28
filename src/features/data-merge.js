@@ -13,9 +13,9 @@ export const mergeList = (o = [], a = [], c = stampOf) => {
   return [...b.values()];
 };
 
-// Đánh dấu xóa (tombstone): prefs.tombs = { pages: {id: thời điểm xóa}, nbViews: {id: thời điểm xóa} }
+// Đánh dấu xóa (tombstone): prefs.tombs = { pages, nbViews, notebooks, tasks: {id: thời điểm xóa} }
 const TOMB_KEEP_MS = 180 * 24 * 3600 * 1000;
-const TOMB_KINDS = ['pages', 'nbViews'];
+const TOMB_KINDS = ['pages', 'nbViews', 'notebooks', 'tasks'];
 
 // Gộp hai bảng đánh dấu xóa: mỗi id lấy thời điểm xóa muộn hơn
 export const mergeTombs = (x, y) => {
@@ -108,9 +108,9 @@ export const mergeData = (o, a) => {
   Object.keys(mergedNbViews).forEach((k) => { mergedNbViews[k] = applyTombs(mergedNbViews[k], tombs.nbViews); });
   return {
     prefs: { ...(a.prefs || {}), ...(o.prefs || {}), activity, nbViews: mergedNbViews, vstats: mergedVstats, tombs },
-    notebooks: mergeList(o.notebooks, a.notebooks).sort(byCreatedDesc),
+    notebooks: applyTombs(mergeList(o.notebooks, a.notebooks).sort(byCreatedDesc), tombs.notebooks),
     pages: applyTombs(mergeList(o.pages, a.pages).sort(byCreatedDesc), tombs.pages),
     flashcards: mergeList(o.flashcards, a.flashcards),
-    tasks: mergeList(o.tasks, a.tasks),
+    tasks: applyTombs(mergeList(o.tasks, a.tasks), tombs.tasks),
   };
 };
