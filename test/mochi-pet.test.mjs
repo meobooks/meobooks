@@ -53,13 +53,14 @@ t('afterAction: extra ghi đè (vuốt ve cập nhật lastPet)', () => {
   assert.equal(next.mood, 50);
 });
 
-t('legacy gọi đúng 4 chỗ qua meoFeat, không còn thẻ script cũ', () => {
-  const count = (s) => legacy.split(s).length - 1;
+t('MochiPet gọi đúng 4 chỗ qua meoFeat (nay trong src/ui/mochi-pet.js), legacy không còn thẻ script cũ', () => {
+  const petUi = readFileSync(new URL('../src/ui/mochi-pet.js', import.meta.url), 'utf8');
+  const count = (s) => petUi.split(s).length - 1;
   assert.equal(count('petLogic=meoFeat.mochiPet'), 1);
   assert.equal(count('petLogic.decayedStats(base,now)'), 1);
   assert.equal(count('petLogic.cooldownLeft(base.lastPet,now)'), 1);
   assert.equal(count('petLogic.afterAction({food,mood,spent,balance,lastPet:base.lastPet},cost,dFood,dMood,now,extra)'), 1);
-  assert.equal(count('src="mochi-pet.js"'), 0);
+  assert.equal(legacy.split('src="mochi-pet.js"').length - 1, 0);
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);

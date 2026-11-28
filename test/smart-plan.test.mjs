@@ -16,7 +16,7 @@ t('src/ui/smart-plan.js xuất makeSmartPlan nhận JCard, planToday, DAYN, idxO
 t('src/ui/index.js gom makeSmartPlan', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeSmartPlan } from './smart-plan.js';"));
-  assert.ok(s.includes('makeSmartPlan };'));
+  assert.ok(s.includes('makeSmartPlan, makeMochiPet };'));
 });
 
 t('legacy: SmartPlan lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
