@@ -14,7 +14,7 @@ t('src/ui/shared.js xuất JCard và JLoading', () => {
 });
 
 t('src/ui/index.js gom ui và App đưa vào window.meobooksFeatures', () => {
-  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame }'));
+  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt }'));
   const app = read('src/app/App.jsx');
   assert.ok(app.includes("import { ui } from '../ui/index.js'"));
   assert.ok(app.includes('syncPolicy, ui };'));

@@ -57,7 +57,8 @@ t('legacy: dùng module cho cấp độ, huy hiệu và vòng mở khóa', () =>
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('lvlInfo=meoFeat.progression.lvlInfo'));
   assert.ok(legacy.includes('ACH_DEFS=meoFeat.progression.ACH_DEFS'));
-  assert.ok(legacy.includes('meoFeat.progression.newlyUnlocked(ACH_DEFS,p,l.ach)'));
+  const hookSrc = readFileSync(new URL('../src/ui/jlpt-hook.js', import.meta.url), 'utf8');
+  assert.ok(hookSrc.includes('meoFeat.progression.newlyUnlocked(ACH_DEFS,p,l.ach)'));
   assert.ok(!legacy.includes('let n=1,need=10,left='));
 });
 
