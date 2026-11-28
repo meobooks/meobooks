@@ -67,9 +67,59 @@ t('mergeData: nbViews gộp theo view, giữ bản mới hơn (theo updatedAt)',
   assert.ok(views.v2);
 });
 
+t('applyTombs: bỏ mục đã xóa; giữ mục được sửa sau thời điểm xóa', () => {
+  const tombs = { a: '2026-11-05T00:00:00Z', b: '2026-11-05T00:00:00Z' };
+  const list = [
+    { id: 'a', updatedAt: '2026-11-01T00:00:00Z' },
+    { id: 'b', updatedAt: '2026-11-09T00:00:00Z' },
+    { id: 'c', updatedAt: '2026-11-01T00:00:00Z' },
+  ];
+  assert.deepEqual(M.applyTombs(list, tombs).map((x) => x.id), ['b', 'c']);
+  assert.deepEqual(M.applyTombs(list, undefined).map((x) => x.id), ['a', 'b', 'c']);
+});
+
+t('mergeTombs: mỗi id lấy thời điểm xóa muộn hơn', () => {
+  const r = M.mergeTombs({ pages: { p: '2026-11-01T00:00:00Z' } }, { pages: { p: '2026-11-03T00:00:00Z', q: '2026-11-02T00:00:00Z' } });
+  assert.deepEqual(r.pages, { p: '2026-11-03T00:00:00Z', q: '2026-11-02T00:00:00Z' });
+  assert.deepEqual(r.nbViews, {});
+});
+
+t('mergeData: trang đã xóa không quay lại khi bên kia còn bản cũ', () => {
+  const tombL = { prefs: { tombs: { pages: { p1: '2026-11-05T00:00:00Z' } } }, pages: [{ id: 'p2', updatedAt: '2026-11-01T00:00:00Z' }] };
+  const staleR = { prefs: {}, pages: [{ id: 'p1', updatedAt: '2026-11-01T00:00:00Z' }] };
+  const r = M.mergeData(tombL, staleR);
+  assert.deepEqual(r.pages.map((x) => x.id), ['p2']);
+  assert.ok(r.prefs.tombs.pages.p1);
+});
+
+t('mergeData: trang bị sửa sau khi xóa ở nơi khác thì được giữ lại', () => {
+  const tombL = { prefs: { tombs: { pages: { p1: '2026-11-05T00:00:00Z' } } }, pages: [] };
+  const newerR = { prefs: {}, pages: [{ id: 'p1', updatedAt: '2026-11-09T00:00:00Z' }] };
+  assert.deepEqual(M.mergeData(tombL, newerR).pages.map((x) => x.id), ['p1']);
+});
+
+t('addTombs: ghi thời điểm xóa, bỏ đánh dấu quá 180 ngày', () => {
+  const now = Date.parse('2026-11-28T00:00:00Z');
+  const prefs = { tombs: { pages: { old: '2026-01-01T00:00:00Z', recent: '2026-11-01T00:00:00Z' } } };
+  const r = M.addTombs(prefs, 'pages', ['p9'], now);
+  assert.equal(r.pages.old, undefined);
+  assert.equal(r.pages.recent, '2026-11-01T00:00:00Z');
+  assert.equal(r.pages.p9, new Date(now).toISOString());
+});
+
+t('tombsAfterNbViews: view bị bỏ khỏi danh sách được đánh dấu xóa', () => {
+  const now = Date.parse('2026-11-28T00:00:00Z');
+  const prefs = { nbViews: { nb1: [{ id: 'v1' }, { id: 'v2' }] } };
+  const r = M.tombsAfterNbViews(prefs, { nb1: [{ id: 'v2' }] }, now);
+  assert.ok(r.nbViews.v1);
+  assert.equal(r.nbViews.v2, undefined);
+});
+
 t('legacy: dùng module cho stampOf, mergeList và mergeData', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('mergeData=meoFeat.dataMerge.mergeData'));
+  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"pages"'));
+  assert.ok(legacy.includes('meoFeat.dataMerge.tombsAfterNbViews(s0,nv,Date.now())'));
   assert.ok(!legacy.includes('mergeData=(o,a)=>{var v,A;'));
 });
 

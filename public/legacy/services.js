@@ -80,6 +80,29 @@
     return [...b.values()];
   }
 
+  // Đánh dấu xóa (tombstone) trong prefs.tombs — logic giống src/features/data-merge.js
+  function mergeTombs(x, y) {
+    const out = {};
+    ['pages', 'nbViews'].forEach((k) => {
+      const m = Object.assign({}, ((x || {})[k]) || {});
+      Object.entries(((y || {})[k]) || {}).forEach(([id, t]) => {
+        if (!m[id] || (Date.parse(t) || 0) > (Date.parse(m[id]) || 0)) m[id] = t;
+      });
+      out[k] = m;
+    });
+    return out;
+  }
+
+  function applyTombs(list, tombs) {
+    const t = tombs || {};
+    return (list || []).filter((it) => {
+      const del = t[it.id];
+      if (!del) return true;
+      const stamp = Date.parse(it.updatedAt || it.createdAt || '') || 0;
+      return stamp > (Date.parse(del) || 0);
+    });
+  }
+
   function mergeData(o, a) {
     const activity = Object.assign({}, (a.prefs && a.prefs.activity) || {});
     Object.entries((o.prefs && o.prefs.activity) || {}).forEach(([f, L]) => {
@@ -110,10 +133,12 @@
         last: st.last || old.last,
       };
     });
+    const tombs = mergeTombs(a.prefs && a.prefs.tombs, o.prefs && o.prefs.tombs);
+    Object.keys(mergedNbViews).forEach((k) => { mergedNbViews[k] = applyTombs(mergedNbViews[k], tombs.nbViews); });
     return {
-      prefs: Object.assign({}, a.prefs || {}, o.prefs || {}, { activity, nbViews: mergedNbViews, vstats: mergedVstats }),
+      prefs: Object.assign({}, a.prefs || {}, o.prefs || {}, { activity, nbViews: mergedNbViews, vstats: mergedVstats, tombs }),
       notebooks: mergeList(o.notebooks, a.notebooks).sort(byCreated),
-      pages: mergeList(o.pages, a.pages).sort(byCreated),
+      pages: applyTombs(mergeList(o.pages, a.pages).sort(byCreated), tombs.pages),
       flashcards: mergeList(o.flashcards, a.flashcards),
       tasks: mergeList(o.tasks, a.tasks),
     };

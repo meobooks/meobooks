@@ -13,6 +13,57 @@ export const mergeList = (o = [], a = [], c = stampOf) => {
   return [...b.values()];
 };
 
+// Đánh dấu xóa (tombstone): prefs.tombs = { pages: {id: thời điểm xóa}, nbViews: {id: thời điểm xóa} }
+const TOMB_KEEP_MS = 180 * 24 * 3600 * 1000;
+const TOMB_KINDS = ['pages', 'nbViews'];
+
+// Gộp hai bảng đánh dấu xóa: mỗi id lấy thời điểm xóa muộn hơn
+export const mergeTombs = (x, y) => {
+  const out = {};
+  TOMB_KINDS.forEach((k) => {
+    const m = { ...(((x || {})[k]) || {}) };
+    Object.entries(((y || {})[k]) || {}).forEach(([id, t]) => {
+      if (!m[id] || (Date.parse(t) || 0) > (Date.parse(m[id]) || 0)) m[id] = t;
+    });
+    out[k] = m;
+  });
+  return out;
+};
+
+// Bỏ các mục đã bị xóa, trừ khi mục được sửa/tạo sau thời điểm xóa
+export const applyTombs = (list, tombs) => {
+  const t = tombs || {};
+  return (list || []).filter((it) => {
+    const del = t[it.id];
+    if (!del) return true;
+    const stamp = Date.parse(it.updatedAt || it.createdAt || '') || 0;
+    return stamp > (Date.parse(del) || 0);
+  });
+};
+
+// Thêm đánh dấu xóa cho các id của `kind`, và bỏ đánh dấu quá 180 ngày
+export const addTombs = (prefs, kind, ids, now) => {
+  const tombs = mergeTombs(prefs && prefs.tombs, {});
+  const cutoff = now - TOMB_KEEP_MS;
+  TOMB_KINDS.forEach((k) => {
+    Object.keys(tombs[k]).forEach((id) => {
+      if ((Date.parse(tombs[k][id]) || 0) < cutoff) delete tombs[k][id];
+    });
+  });
+  ids.forEach((id) => { tombs[kind][id] = new Date(now).toISOString(); });
+  return tombs;
+};
+
+// Các view bị bỏ khi danh sách nbViews đổi từ prefs.nbViews sang nv
+export const tombsAfterNbViews = (prefs, nv, now) => {
+  const removed = [];
+  Object.entries((prefs && prefs.nbViews) || {}).forEach(([nbId, list]) => {
+    const keep = new Set((((nv || {})[nbId]) || []).map((v) => v.id));
+    (list || []).forEach((v) => { if (!keep.has(v.id)) removed.push(v.id); });
+  });
+  return addTombs(prefs, 'nbViews', removed, now);
+};
+
 // Hợp nhất toàn bộ dữ liệu người dùng.
 // o: bên cần ưu tiên (thường là bản trên máy); a: bên còn lại (thường là bản trên tài khoản).
 export const mergeData = (o, a) => {
@@ -53,10 +104,12 @@ export const mergeData = (o, a) => {
     };
   });
 
+  const tombs = mergeTombs(a.prefs && a.prefs.tombs, o.prefs && o.prefs.tombs);
+  Object.keys(mergedNbViews).forEach((k) => { mergedNbViews[k] = applyTombs(mergedNbViews[k], tombs.nbViews); });
   return {
-    prefs: { ...(a.prefs || {}), ...(o.prefs || {}), activity, nbViews: mergedNbViews, vstats: mergedVstats },
+    prefs: { ...(a.prefs || {}), ...(o.prefs || {}), activity, nbViews: mergedNbViews, vstats: mergedVstats, tombs },
     notebooks: mergeList(o.notebooks, a.notebooks).sort(byCreatedDesc),
-    pages: mergeList(o.pages, a.pages).sort(byCreatedDesc),
+    pages: applyTombs(mergeList(o.pages, a.pages).sort(byCreatedDesc), tombs.pages),
     flashcards: mergeList(o.flashcards, a.flashcards),
     tasks: mergeList(o.tasks, a.tasks),
   };

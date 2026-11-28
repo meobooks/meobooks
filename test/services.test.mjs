@@ -59,6 +59,10 @@ const orig = DM;
     if (!deq(orig.mergeList(A, B), svc.sync.mergeList(A, B))) bad++;
   }
   check(bad === 0, `mergeData/mergeList services khớp bản chuẩn (2000 ca, lệch: ${bad})`);
+  const tL = { prefs: { tombs: { pages: { p1: '2026-11-05T00:00:00Z' } } }, notebooks: [], pages: [{ id: 'p1', updatedAt: '2026-11-01T00:00:00Z' }, { id: 'p2', updatedAt: '2026-11-01T00:00:00Z' }], flashcards: [], tasks: [] };
+  const tR = { prefs: {}, notebooks: [], pages: [{ id: 'p1', updatedAt: '2026-11-01T00:00:00Z' }], flashcards: [], tasks: [] };
+  const expT = DM.mergeData(tL, tR);
+  check(deq(expT, svc.sync.mergeData(tL, tR)) && expT.pages.map((x) => x.id).join() === 'p2', 'tombstone: services và module cùng cho kết quả, p1 đã xóa còn p2');
 }
 
 // 3) localStore: khóa và định dạng giữ nguyên
