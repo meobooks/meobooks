@@ -8,5 +8,6 @@ import { makeReadView } from './read-view.js';
 import { makeNbEditModal } from './nb-edit-modal.js';
 import { makeN2Roadmap } from './n2-roadmap.js';
 import { makePomodoroWidget } from './pomodoro-widget.js';
+import { makeSubjectPicker } from './subject-picker.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker };

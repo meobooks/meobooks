@@ -14,7 +14,7 @@ t('src/ui/shared.js xuất JCard và JLoading', () => {
 });
 
 t('src/ui/index.js gom ui và App đưa vào window.meobooksFeatures', () => {
-  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget }'));
+  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker }'));
   const app = read('src/app/App.jsx');
   assert.ok(app.includes("import { ui } from '../ui/index.js'"));
   assert.ok(app.includes('syncPolicy, ui };'));
