@@ -58,6 +58,7 @@ export function makeNoiTu({ front, cleanT, nbOf, classOf, nbDeckPicker, ntSnd, s
     const usedInDeck=deck.list.filter(x=>usedSet.has(x.v.id)).length;
     const canPlay=playPool.length>=10;
     const n=meoFeat.noitu.roundSize(cnt,playPool.length);
+    const maxN=Math.min(100,playPool.length);
 
     const card={backgroundColor:a.card,borderColor:a.border,color:a.text};
     const chip={backgroundColor:a.accentSoft,color:a.text,borderRadius:99,padding:"5px 12px",fontSize:12,fontWeight:800};

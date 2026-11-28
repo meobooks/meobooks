@@ -11,6 +11,7 @@ t('src/ui/noi-tu.js xuất makeNoiTu nhận các phụ thuộc đã truyền và
   assert.ok(s.includes('export function makeNoiTu({ front, cleanT, nbOf, classOf, nbDeckPicker, ntSnd, shuffle, JLoading, MochiMascot, meoFeat })'));
   assert.ok(s.includes('Nối Từ'));
   assert.ok(s.includes('meoFeat.noitu.playPool(deck.list,usedSet,order)'));
+  assert.ok(s.includes('const maxN=Math.min(100,playPool.length);'), 'slider dùng maxN phải được khai báo');
 });
 
 t('src/ui/index.js gom makeNoiTu', () => {
