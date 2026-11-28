@@ -14,7 +14,7 @@ t('src/ui/app.js xuất makeApp và trả về component App', () => {
 
 t('src/ui/index.js gom makeApp', () => {
   assert.ok(idx.includes("import { makeApp } from './app.js';"));
-  assert.ok(idx.includes('makeYtListening, makeApp };'));
+  assert.ok(idx.includes('makeYtListening, makeApp, makeNbDeckPicker };'));
 });
 
 t('legacy không còn function App, và gọi makeApp ngay trước root.render', () => {
