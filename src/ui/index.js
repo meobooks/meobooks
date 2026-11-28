@@ -17,5 +17,6 @@ import { makeBookViewer } from './book-viewer.js';
 import { makeSmartPlan } from './smart-plan.js';
 import { makeMochiPet } from './mochi-pet.js';
 import { makeRmLesson } from './rm-lesson.js';
+import { makeNoiTu } from './noi-tu.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu };

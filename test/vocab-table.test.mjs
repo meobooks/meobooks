@@ -16,7 +16,7 @@ t('src/ui/vocab-table.js xuất VocabTable và giữ khóa kho từ', () => {
 t('src/ui/index.js gom VocabTable', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { VocabTable } from './vocab-table.js';"));
-  assert.ok(s.includes('VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson };'));
+  assert.ok(s.includes('VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu };'));
 });
 
 t('legacy: VocabTable lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
