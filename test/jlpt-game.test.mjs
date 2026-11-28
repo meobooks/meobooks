@@ -1,5 +1,6 @@
 // Kiểm thử tách JLPT bước 2: JlptGame và QUEST_DEFS đã chuyển; app cũ dùng qua meoFeat.
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import assert from 'node:assert/strict';
 
 let pass = 0;
@@ -14,7 +15,7 @@ t('src/ui/jlpt-game.js xuất JlptGame và nhận MochiPet qua props', () => {
 });
 
 t('src/ui/index.js đưa JlptGame vào ui', () => {
-  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening };'));
+  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu, makeYtListening, makeApp };'));
 });
 
 t('features/progression.js xuất QUEST_DEFS', () => {
@@ -26,7 +27,7 @@ t('legacy: JlptGame và QUEST_DEFS lấy từ module; hai chỗ gọi đều tru
   assert.ok(legacy.includes('const JlptGame=meoFeat.ui.JlptGame;'));
   assert.ok(!legacy.includes('function JlptGame({jl:o'));
   assert.ok(legacy.includes('QUEST_DEFS=meoFeat.progression.QUEST_DEFS'));
-  assert.equal(legacy.split('React.createElement(JlptGame,{jl:GeAll,MochiPet:MochiPet,').length - 1, 2);
+  assert.equal(appSrc.split('React.createElement(JlptGame,{jl:GeAll,MochiPet:MochiPet,').length - 1, 2);
 });
 
 console.log(`\n${pass} kiểm thử đạt`);

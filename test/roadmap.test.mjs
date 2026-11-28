@@ -1,5 +1,6 @@
 // Kiểm thử src/features/roadmap.js (logic Lantern Lane tách từ legacy).
 import { readFileSync } from 'node:fs';
+const appSrc = readFileSync(new URL('../src/ui/app.js', import.meta.url), 'utf8');
 import assert from 'node:assert/strict';
 import * as RM from '../src/features/roadmap.js';
 
@@ -64,8 +65,8 @@ console.log('ok - VocabTable nằm trong src/ui/vocab-table.js và legacy dùng 
 
 // Kho từ: tick mở chọn sổ, bỏ tick xóa khỏi kho; App gắn khoAdd/khoRemove
 const legacyKho = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-assert.equal(legacyKho.includes('khoAdd:khoAddFn,khoRemove:khoRemoveFn,notebooks:E'), true);
-assert.equal(legacyKho.includes('const khoAddFn=async(row,nbId)=>{'), true);
-assert.equal(legacyKho.includes('await Ge.deleteVocab(id)'), true);
+assert.equal(appSrc.includes('khoAdd:khoAddFn,khoRemove:khoRemoveFn,notebooks:E'), true);
+assert.equal(appSrc.includes('const khoAddFn=async(row,nbId)=>{'), true);
+assert.equal(appSrc.includes('await Ge.deleteVocab(id)'), true);
 assert.equal(readFileSync(new URL('../src/ui/n2-roadmap.js', import.meta.url), 'utf8').includes('khoAdd:khoAdd,khoRemove:khoRemove,notebooks:notebooks'), true);
 console.log('ok - kho từ được nối từ App xuống bảng');
