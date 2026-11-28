@@ -16,7 +16,7 @@ t('src/ui/book-viewer.js xuất makeBookViewer nhận PageRead và meoFeat', () 
 t('src/ui/index.js gom makeBookViewer', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeBookViewer } from './book-viewer.js';"));
-  assert.ok(s.includes('makeBookViewer };'));
+  assert.ok(s.includes('makeBookViewer, makeSmartPlan };'));
 });
 
 t('legacy: BookViewer lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
