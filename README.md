@@ -139,19 +139,23 @@ hàm phụ), và `src/features/srs.js` (dayKey, addDaysKey, idxOf, DAYN, sm2, pl
 (useJlpt, sync, tải roadmap) và giao diện JLPT, Study, Notebook. Các phần này cần kiểm trên tài khoản thật.
 
 
-## Trạng thái (cập nhật 27/11/2026)
+## Trạng thái (cập nhật 28/11/2026)
 
 ### Đã kiểm chứng trên trình duyệt
 - Quên mật khẩu (email, đặt mật khẩu mới, liên kết hết hạn) và dọn dẹp (preconnect, bỏ sw.js)
 - Pomodoro, Mochi Pet, luyện nghe YouTube, BanTu, Nối từ, đọc sách và xem trang, Lantern Lane, SRS, kiểm đáp án
-
-### Chờ kiểm chứng
-- Bảng từ vựng tiếng Trung (VocabTable) trong bài Lantern Lane, cùng cấp HSK 7–9
+- Dữ liệu tài khoản: từ vựng và sổ hiển thị đúng sau khi khôi phục
+- Bảng từ vựng tiếng Trung (VocabTable) trong Lantern Lane, cùng cấp HSK 7–9
 - Nút Pomodoro hiện trên màn hình rộng (z-50, nằm trên thanh bên)
+- Kho từ (bảng tiếng Trung): tích thêm từ vào kho flashcard
+
+### Chưa kiểm chứng
+- Đồng bộ trên tài khoản thử: lưu, tải lại, tài khoản mới, hai thiết bị cùng sửa, xóa trang và view
 
 ### Đã biết, chưa xử lý
-- **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu đã được ghi đè lên dữ liệu trên Supabase trong lúc đặt lại dữ liệu trình duyệt. Đã thêm chốt chặn: không lưu lên máy chủ khi chưa tải xong dữ liệu, và tài khoản chưa có dòng thì chỉ tạo bằng insert, không ghi đè. Chưa kiểm chứng trên tài khoản thử; chưa dùng tài khoản thật cho tới khi xong.
-- **Kho từ (bảng tiếng Trung):** ô tích thêm từ vào kho flashcard (`khoAddFn`), qua `addMany` rồi cập nhật `pages` và lưu toàn dòng. Thao tác này chưa có chốt chặn riêng và chưa được kiểm chứng trên tài khoản thử.
+- **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu từng ghi đè lên dữ liệu trên Supabase khi đặt lại dữ liệu trình duyệt. Đã thêm chốt chặn: không lưu lên máy chủ khi chưa tải xong dữ liệu, và tài khoản chưa có dòng thì chỉ tạo bằng insert, không ghi đè.
+- **Realtime:** `subscribeRealtime` ghi đè trạng thái cục bộ bằng dữ liệu từ xa, chưa hợp nhất như luồng tải và lưu. Có thể mất thay đổi chưa lưu.
+- **Xóa:** chỉ trang và view có tombstone (không quay lại khi hợp nhất). Các thao tác xóa khác chưa có cơ chế này.
 - **Đã tách logic JLPT và đồng bộ** sang `src/features/` (buổi học, câu hỏi, tiến độ, từ vựng, nhập hàng loạt, hợp nhất dữ liệu, dữ liệu mặc định, quyết định tải/lưu). Phần còn lại vẫn trong `public/legacy/index.html`: giao diện React, và các lệnh gọi Supabase (`fetchRow`, `upsertRow`, `insertRow`). Cần kiểm trên tài khoản thử trước khi tách tiếp.
 - **Deploy:** môi trường `github-pages` phải cho phép nhánh `migration-vite`, và Pages phải dùng nguồn GitHub Actions.
 
