@@ -16,7 +16,7 @@ t('src/ui/pomodoro-widget.js xuất makePomodoroWidget nhận fmtTime và meoFea
 t('src/ui/index.js gom makePomodoroWidget', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makePomodoroWidget } from './pomodoro-widget.js';"));
-  assert.ok(s.includes('makePomodoroWidget, makeSubjectPicker };'));
+  assert.ok(s.includes('makePomodoroWidget, makeSubjectPicker, VocabTable };'));
 });
 
 t('legacy: PomodoroWidget lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
