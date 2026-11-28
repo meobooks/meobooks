@@ -150,12 +150,12 @@ hàm phụ), và `src/features/srs.js` (dayKey, addDaysKey, idxOf, DAYN, sm2, pl
 - Nút Pomodoro hiện trên màn hình rộng (z-50, nằm trên thanh bên)
 
 ### Đã biết, chưa xử lý
-- **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu đã được ghi đè lên dữ liệu trên Supabase trong lúc đặt lại dữ liệu trình duyệt. Đang điều tra. Chưa dùng tài khoản thật để thử bản mới cho tới khi xong.
-- **Kho từ (bảng tiếng Trung):** ô tích chỉ lưu trên máy, chưa đồng bộ lên Supabase.
-- **Giao diện JLPT, Study, Notebook, và phần tải dữ liệu từ Supabase** vẫn nằm trong `public/legacy/index.html`. Cần kiểm trên tài khoản thử trước khi tách.
+- **Dữ liệu tài khoản:** một số sổ mặc định và thẻ mẫu đã được ghi đè lên dữ liệu trên Supabase trong lúc đặt lại dữ liệu trình duyệt. Đã thêm chốt chặn: không lưu lên máy chủ khi chưa tải xong dữ liệu, và tài khoản chưa có dòng thì chỉ tạo bằng insert, không ghi đè. Chưa kiểm chứng trên tài khoản thử; chưa dùng tài khoản thật cho tới khi xong.
+- **Kho từ (bảng tiếng Trung):** ô tích thêm từ vào kho flashcard (`khoAddFn`), qua `addMany` rồi cập nhật `pages` và lưu toàn dòng. Thao tác này chưa có chốt chặn riêng và chưa được kiểm chứng trên tài khoản thử.
+- **Đã tách logic JLPT và đồng bộ** sang `src/features/` (buổi học, câu hỏi, tiến độ, từ vựng, nhập hàng loạt, hợp nhất dữ liệu, dữ liệu mặc định, quyết định tải/lưu). Phần còn lại vẫn trong `public/legacy/index.html`: giao diện React, và các lệnh gọi Supabase (`fetchRow`, `upsertRow`, `insertRow`). Cần kiểm trên tài khoản thử trước khi tách tiếp.
 - **Deploy:** môi trường `github-pages` phải cho phép nhánh `migration-vite`, và Pages phải dùng nguồn GitHub Actions.
 
 ### Cách tách tính năng
-- Logic thuần nằm trong `src/features/`, được gắn lên `window.meobooksFeatures` ở `src/app/App.jsx`.
+- Logic thuần nằm trong `src/features/`, được gắn lên `window.meobooksFeatures` ở `src/app/App.jsx`. Các module hiện có: pomodoro, mochi-pet, youtube-text, bantu, noitu, reader, roadmap, vocab, plan, srs, answer, smart-session, question, progression, study-flow, study-session, vocab-list, bulk-vocab, data-merge, seed, sync-policy.
 - Legacy đọc các hàm này qua biến `meoFeat`, lấy từ `window.parent.meobooksFeatures`.
 - Mỗi module có bộ kiểm thử Node trong `test/`.
