@@ -284,7 +284,8 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check(legacy.includes('if(recovery)return(()=>') && legacy.indexOf('if(recovery)return') < legacy.indexOf('if(!o)return(()=>{const H=React.createElement,FEATS='), 'legacy: màn đặt mật khẩu được kiểm tra trước màn đăng nhập');
   check(legacy.includes('meobooksServices.auth.updatePassword(rcForm.pw)'), 'legacy: màn đặt mật khẩu gọi auth.updatePassword');
   check(legacy.includes('[R,j]=useState(()=>meobooksServices.auth.bootAuthError())'), 'legacy: liên kết hỏng/hết hạn hiện thông báo ở khung đăng nhập');
-  check(appJsx.includes('LEGACY_URL + h') && appJsx.includes('replaceState'), 'shell: App.jsx chuyển phần # vào iframe và xóa khỏi thanh địa chỉ');
+  const hostJsx = readFileSync(new URL('../src/app/LegacyHost.jsx', import.meta.url), 'utf8');
+  check(hostJsx.includes('AUTH_HASH') && hostJsx.includes('replaceState'), 'shell: LegacyHost xóa phần # nhạy cảm khỏi thanh địa chỉ sau khi legacy nạp xong');
   const re = /^#(?:.*&)?(?:access_token|error|error_code|type)=/;
   check(re.test('#access_token=a&type=recovery') && re.test('#error=access_denied&error_code=otp_expired') && !re.test('#/dashboard') && !re.test(''), 'shell: biểu thức nhận diện # đúng với liên kết email, bỏ qua #/dashboard');
 }

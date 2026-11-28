@@ -93,7 +93,7 @@ h2,h3,h4{font-family:"Baloo 2","Nunito",sans-serif;font-weight:800;letter-spacin
 </style>
 </head>
 <body>
-<div id="root"><div id="boot"><i></i><span>meobooks đang mở sổ…</span></div></div>
+<div id="legacy-root"><div id="boot"><i></i><span>meobooks đang mở sổ…</span></div></div>
 <script>var meoFeat=(window.parent&&window.parent.meobooksFeatures)||window.meobooksFeatures;var meoCloudLoaded=false;var meoBaseStamp=null;</script>
 <script src="services.js"></script>
 <script>(function bootApp(){
@@ -3720,7 +3720,7 @@ return H("div",{className:"min-h-screen bg-gradient-to-br from-[#F8DDE8] via-[#F
 
     Nt&&React.createElement("div",{className:"fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"},React.createElement("div",{style:{backgroundColor:n.card,borderColor:n.border},className:"max-w-lg w-full p-6 rounded-3xl border-2 shadow-2xl space-y-4"},React.createElement("div",{className:"flex justify-between"},React.createElement("h3",{className:"text-lg font-extrabold"},"Nhập Từ Vựng Hàng Loạt"),React.createElement("button",{onClick:()=>Re(!1)},"✕")),React.createElement("p",{className:"text-xs opacity-75"},"Định dạng mỗi dòng: ",React.createElement("code",null,"Từ vựng - Cách đọc - Nghĩa - Ví dụ")),React.createElement("textarea",{rows:5,value:Ve,onChange:e=>et(e.target.value),placeholder:`猫 - ねこ - Con mèo - 猫が好きです。\n勉強 - べんきょう - Học tập - 日本語を勉強します。`,className:"w-full p-3 rounded-2xl border text-sm",style:{borderColor:n.border}}),React.createElement("button",{onClick:Pt,style:{backgroundColor:n.accent},className:"w-full py-2.5 rounded-xl text-white text-xs font-bold"},"Thêm vào bảng")))));
 }
-const root=ReactDOM.createRoot(document.getElementById("root"));root.render(React.createElement(App,null));
+const root=ReactDOM.createRoot(document.getElementById("legacy-root"));root.render(React.createElement(App,null));
 })();</script>
 </body>
 </html>
