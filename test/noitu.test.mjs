@@ -45,9 +45,10 @@ t('usedAfterReset: bỏ các id thuộc bộ', () => {
 });
 
 t('legacy dùng noitu qua meoFeat', () => {
-  assert.equal(legacy.includes('meoFeat.noitu.roundSize(cnt,playPool.length)'), true);
-  assert.equal(legacy.includes('meoFeat.noitu.splitBatches(picked,BATCH)'), true);
-  assert.equal(legacy.includes('const xp=Math.min(10,Math.max(1,Math.floor(ng.n/5)));'), false);
+  const noiTuSrc = readFileSync(new URL('../src/ui/noi-tu.js', import.meta.url), 'utf8');
+  assert.equal(noiTuSrc.includes('meoFeat.noitu.roundSize(cnt,playPool.length)'), true);
+  assert.equal(noiTuSrc.includes('meoFeat.noitu.splitBatches(picked,BATCH)'), true);
+  assert.equal(legacy.includes('const xp=Math.min(10,Math.max(1,Math.floor(ng.n/5)));') || noiTuSrc.includes('const xp=Math.min(10,Math.max(1,Math.floor(ng.n/5)));'), false);
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);

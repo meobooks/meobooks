@@ -16,7 +16,7 @@ t('src/ui/read-view.js xuất makeReadView nhận cleanT và PageRead', () => {
 t('src/ui/index.js gom makeReadView', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeReadView } from './read-view.js';"));
-  assert.ok(s.includes('makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson };'));
+  assert.ok(s.includes('makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu };'));
 });
 
 t('legacy: ReadView lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

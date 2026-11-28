@@ -6,6 +6,7 @@ import * as DM from '../src/features/data-merge.js';
 const here = new URL('.', import.meta.url);
 const servicesSrc = readFileSync(new URL('../public/legacy/services.js', import.meta.url), 'utf8');
 const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+const noiTuSrc = readFileSync(new URL('../src/ui/noi-tu.js', import.meta.url), 'utf8');
 
 // Môi trường giả: window + localStorage + Notification không cần thiết
 function makeWindow(extra = {}) {
@@ -152,8 +153,8 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 {
   check(!legacy.includes('"nt_best_"+ng.deckId'), 'legacy: finish nt không còn gọi localStorage trực tiếp');
   check(!legacy.includes('lsGet("nt_best_"'), 'legacy: màn giới thiệu nt không còn lsGet("nt_best_")');
-  check(legacy.includes('LS.getBestScore("nt",ng.deckId)') && legacy.includes('LS.setBestScore("nt",ng.deckId,score)'), 'legacy: finish nt dùng getBestScore/setBestScore');
-  check(legacy.includes('window.meobooksServices.localStore.getBestScore("nt",deck.id)'), 'legacy: màn giới thiệu nt đọc qua getBestScore');
+  check(noiTuSrc.includes('LS.getBestScore("nt",ng.deckId)') && noiTuSrc.includes('LS.setBestScore("nt",ng.deckId,score)'), 'noi-tu: finish nt dùng getBestScore/setBestScore');
+  check(noiTuSrc.includes('window.meobooksServices.localStore.getBestScore("nt",deck.id)'), 'noi-tu: màn giới thiệu nt đọc qua getBestScore');
 }
 
 // 10) Lưu trữ cục bộ: meobooks_subjects_* (danh sách môn học)
