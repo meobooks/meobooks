@@ -42,7 +42,8 @@ t('canTurn: không lật quá giới hạn ở cả hai chế độ', () => {
 t('legacy dùng reader qua meoFeat', () => {
   assert.equal(legacy.includes('meoFeat.reader.canTurn(dir,single,s,ci,maxS,maxC)'), true);
   assert.equal(legacy.includes('meoFeat.reader.bookBounds(n)'), true);
-  assert.equal(legacy.includes('const hasInk=meoFeat.reader.hasInkStrokes(p);'), true);
+  const pageReadSrc = readFileSync(new URL('../src/ui/page-read.js', import.meta.url), 'utf8');
+  assert.equal(pageReadSrc.includes('const hasInk=meoFeat.reader.hasInkStrokes(p);'), true);
 });
 
 console.log(`\n${passed} kiểm thử đạt.`);
