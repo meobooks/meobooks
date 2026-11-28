@@ -45,6 +45,31 @@ t('saveGate: thứ tự kiểm tra: offline trước, rồi preview, rồi chưa
   assert.equal(P.saveGate({ online: true, isPreview: true, cloudLoaded: false }).status, 'saved');
 });
 
+t('parseStamp: đọc được cả ISO và dạng Postgres (+00), thiếu hoặc sai thì 0', () => {
+  const iso = Date.parse('2026-11-27T12:50:39.084Z');
+  assert.equal(P.parseStamp('2026-11-27T12:50:39.084Z'), iso);
+  assert.equal(P.parseStamp('2026-11-27 12:50:39.084+00'), iso);
+  assert.equal(P.parseStamp('2026-11-27 12:50:39.084+00:00'), iso);
+  assert.equal(P.parseStamp(null), 0);
+  assert.equal(P.parseStamp('không phải ngày'), 0);
+});
+
+t('shouldMergeBeforeWrite: máy chủ không có dòng thì không cần hợp nhất', () => {
+  assert.equal(P.shouldMergeBeforeWrite({ baseline: '2026-11-27T10:00:00Z', remoteUpdatedAt: null }), false);
+});
+
+t('shouldMergeBeforeWrite: mốc khớp (kể cả khác định dạng) thì ghi thẳng', () => {
+  assert.equal(P.shouldMergeBeforeWrite({ baseline: '2026-11-27T12:50:39.084Z', remoteUpdatedAt: '2026-11-27 12:50:39.084+00' }), false);
+});
+
+t('shouldMergeBeforeWrite: máy chủ mới hơn mốc đã biết thì phải hợp nhất', () => {
+  assert.equal(P.shouldMergeBeforeWrite({ baseline: '2026-11-27T10:00:00Z', remoteUpdatedAt: '2026-11-27 11:00:00.000+00' }), true);
+});
+
+t('shouldMergeBeforeWrite: chưa biết mốc nhưng máy chủ đã có dữ liệu thì hợp nhất (an toàn)', () => {
+  assert.equal(P.shouldMergeBeforeWrite({ baseline: null, remoteUpdatedAt: '2026-11-27 11:00:00.000+00' }), true);
+});
+
 t('legacy: dùng module cho quyết định tải và lưu', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
   assert.ok(legacy.includes('meoFeat.syncPolicy.cloudLoadPlan('));

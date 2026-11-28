@@ -18,3 +18,18 @@ export const saveGate = ({ online = true, hasSupabase = true, isPreview = false,
   if (!cloudLoaded) return { upsert: false, status: 'error', message: 'Chưa tải xong dữ liệu tài khoản, chưa lưu lên máy chủ.' };
   return { upsert: true };
 };
+
+// Đổi dấu thời gian về số ms. Chấp nhận cả ISO ("...T...Z") và dạng Postgres ("... +00").
+export const parseStamp = (v) => {
+  if (!v) return 0;
+  const iso = String(v).trim().replace(' ', 'T').replace(/\+00(:?00)?$/, 'Z');
+  const n = Date.parse(iso);
+  return isNaN(n) ? 0 : n;
+};
+
+// Trước khi ghi: nếu máy chủ có dòng với updated_at mới hơn mốc đã biết (lần tải/lưu gần nhất) thì phải hợp nhất trước.
+// baseline rỗng (chưa biết mốc) mà máy chủ đã có dữ liệu thì cũng coi là cần hợp nhất, cho an toàn.
+export const shouldMergeBeforeWrite = ({ baseline = null, remoteUpdatedAt = null } = {}) => {
+  if (!remoteUpdatedAt) return false;
+  return parseStamp(remoteUpdatedAt) > parseStamp(baseline);
+};

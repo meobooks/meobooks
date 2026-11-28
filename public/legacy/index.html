@@ -94,7 +94,7 @@ h2,h3,h4{font-family:"Baloo 2","Nunito",sans-serif;font-weight:800;letter-spacin
 </head>
 <body>
 <div id="root"><div id="boot"><i></i><span>meobooks đang mở sổ…</span></div></div>
-<script>var meoFeat=(window.parent&&window.parent.meobooksFeatures)||window.meobooksFeatures;var meoCloudLoaded=false;</script>
+<script>var meoFeat=(window.parent&&window.parent.meobooksFeatures)||window.meobooksFeatures;var meoCloudLoaded=false;var meoBaseStamp=null;</script>
 <script src="services.js"></script>
 <script>(function bootApp(){
   if(!window.React||!window.ReactDOM){return setTimeout(bootApp,50)}
@@ -3114,7 +3114,7 @@ function App(){
         return;
       }
       if(plan==="apply_cloud"){
-        meoCloudLoaded=true;
+        meoCloudLoaded=true;meoBaseStamp=F.updated_at||null;
         d(F.prefs||createInitialSeed(t).prefs),G(F.notebooks||[]),U(F.pages||[]),ae(F.flashcards||[]),se(F.tasks||[]),p("saved"),m("");
         try{window.meobooksServices.localStore.setLocalData(e.id,{prefs:F.prefs,notebooks:F.notebooks,pages:F.pages,flashcards:F.flashcards,tasks:F.tasks})}catch{}
       }else{
@@ -3122,9 +3122,9 @@ function App(){
         d(O.prefs),G(O.notebooks),U(O.pages),ae(O.flashcards),se(O.tasks);
         try{window.meobooksServices.localStore.setLocalData(e.id,O)}catch{}
         // Máy chủ chưa trả về dòng nào: chỉ TẠO dòng mới (insert), không bao giờ ghi đè dòng đã có
-        const{error:ie}=await window.meobooksServices.sync.insertRow(e.id,O);
+        const stampI=new Date().toISOString();const{error:ie}=await window.meobooksServices.sync.insertRow(e.id,O,stampI);
         if(ie){p("error"),m("Chưa tải được dữ liệu tài khoản. Chưa lưu lên máy chủ để tránh ghi đè.")}
-        else{meoCloudLoaded=true;p("saved"),m("")}
+        else{meoCloudLoaded=true;meoBaseStamp=stampI;p("saved"),m("")}
       }
     }catch(F){console.error(F),p("error"),m(F.message||"Không thể kết nối tới máy chủ Supabase."),applyLocal()}
   };
@@ -3137,7 +3137,7 @@ function App(){
     p("saving");
     const{error:x}=await window.meobooksServices.sync.upsertRow(s.id,r,qe.current=new Date().toISOString());
     if(x)p("error"),m(x.message||"");
-    else{try{window.meobooksServices.localStore.clearDirty(s.id)}catch{}p("saved"),m("")}
+    else{meoBaseStamp=qe.current;try{window.meobooksServices.localStore.clearDirty(s.id)}catch{}p("saved"),m("")}
   };
 
   const St=async()=>{if(!(!supabase||!o||o.id==="preview-user"||!window.meobooksServices.localStore.isDirty(o.id)))try{const{data:e}=await window.meobooksServices.sync.fetchRow(o.id),t=Ee.current||de.current;e?await it(t,e,o):W({})}catch{p("error")}};
@@ -3150,8 +3150,19 @@ function App(){
       try{
         const gate=meoFeat.syncPolicy.saveGate({online:navigator.onLine,hasSupabase:!!supabase,isPreview:o.id==="preview-user",cloudLoaded:meoCloudLoaded});
         if(!gate.upsert){p(gate.status),gate.message&&m(gate.message);return}
-        const{error:s}=await window.meobooksServices.sync.upsertRow(o.id,t,qe.current=new Date().toISOString());
+        // Kiểm tra máy chủ trước khi ghi: nếu có bên khác ghi sau mốc đã biết thì hợp nhất rồi mới ghi
+        const{data:remote,error:fe}=await window.meobooksServices.sync.fetchRow(o.id);
+        if(fe)throw fe;
+        let payload=t;
+        if(meoFeat.syncPolicy.shouldMergeBeforeWrite({baseline:meoBaseStamp,remoteUpdatedAt:remote&&remote.updated_at})){
+          payload=mergeData(t,remote);
+          d(payload.prefs),G(payload.notebooks),U(payload.pages),ae(payload.flashcards),se(payload.tasks),de.current=payload,Ee.current=null;
+          try{window.meobooksServices.localStore.setLocalData(o.id,payload)}catch{}
+        }
+        const stamp=new Date().toISOString();
+        const{error:s}=await window.meobooksServices.sync.upsertRow(o.id,payload,qe.current=stamp);
         if(s)throw s;
+        meoBaseStamp=stamp;
         try{window.meobooksServices.localStore.clearDirty(o.id)}catch{}
         p("saved"),m("")
       }catch(s){console.error("Supabase sync error:",s),p("error"),m(s.message||JSON.stringify(s))}
