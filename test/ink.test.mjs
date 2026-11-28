@@ -23,7 +23,7 @@ t('drawStroke giữ đủ ba nhánh: chấm, bút đánh dấu, bút chì/bút t
 t('src/ui/index.js gom drawStroke và InkView vào ui', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { drawStroke, InkView } from './ink.js';"));
-  assert.ok(s.includes('drawStroke, InkView, makeReadView };'));
+  assert.ok(s.includes('drawStroke, InkView, makeReadView, makeNbEditModal };'));
 });
 
 t('legacy: không còn định nghĩa drawStroke và InkView, lấy từ meoFeat.ui', () => {
