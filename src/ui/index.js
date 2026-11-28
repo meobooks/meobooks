@@ -3,5 +3,6 @@ import { JCard, JLoading } from './shared.js';
 import { JlptGame } from './jlpt-game.js';
 import { makeUseJlpt } from './jlpt-hook.js';
 import { makeJlptStudy } from './jlpt-study.js';
+import { drawStroke, InkView } from './ink.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView };

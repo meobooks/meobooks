@@ -14,7 +14,7 @@ t('src/ui/jlpt-game.js xuất JlptGame và nhận MochiPet qua props', () => {
 });
 
 t('src/ui/index.js đưa JlptGame vào ui', () => {
-  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy };'));
+  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView };'));
 });
 
 t('features/progression.js xuất QUEST_DEFS', () => {

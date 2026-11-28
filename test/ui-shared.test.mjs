@@ -14,7 +14,7 @@ t('src/ui/shared.js xuất JCard và JLoading', () => {
 });
 
 t('src/ui/index.js gom ui và App đưa vào window.meobooksFeatures', () => {
-  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy }'));
+  assert.ok(read('src/ui/index.js').includes('export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView }'));
   const app = read('src/app/App.jsx');
   assert.ok(app.includes("import { ui } from '../ui/index.js'"));
   assert.ok(app.includes('syncPolicy, ui };'));
@@ -22,7 +22,7 @@ t('src/ui/index.js gom ui và App đưa vào window.meobooksFeatures', () => {
 
 t('legacy: JCard và JLoading lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
   const legacy = read('public/legacy/index.html');
-  assert.ok(legacy.includes('const {JCard,JLoading}=meoFeat.ui,EMPTY_V='));
+  assert.ok(legacy.includes('const {JCard,JLoading,drawStroke,InkView}=meoFeat.ui,EMPTY_V='));
   assert.ok(!legacy.includes('const JCard=({theme:o'));
   assert.ok(!legacy.includes('JLoading=({theme:o})'));
 });
