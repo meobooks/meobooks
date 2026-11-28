@@ -23,7 +23,7 @@ t('drawStroke giữ đủ ba nhánh: chấm, bút đánh dấu, bút chì/bút t
 t('src/ui/index.js gom drawStroke và InkView vào ui', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { drawStroke, InkView } from './ink.js';"));
-  assert.ok(s.includes('drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab };'));
+  assert.ok(s.includes('drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer, makeSmartPlan, makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer };'));
 });
 
 t('legacy: không còn định nghĩa drawStroke và InkView, lấy từ meoFeat.ui', () => {
@@ -32,7 +32,8 @@ t('legacy: không còn định nghĩa drawStroke và InkView, lấy từ meoFeat
   assert.ok(!legacy.includes('drawStroke=(o,a)=>'));
   assert.ok(!legacy.includes('function InkView({ink})'));
   assert.ok(legacy.includes('INK_COLORS=["#2D2A32"'));
-  assert.ok(legacy.includes('function InkLayer('));
+  assert.ok(!legacy.includes('function InkLayer('), 'InkLayer nay nằm trong src/ui/ink-layer.js');
+  assert.ok(read('src/ui/ink-layer.js').includes('function InkLayer('));
 });
 
 console.log(`\n${pass} kiểm thử đạt`);
