@@ -13,5 +13,6 @@ import { VocabTable } from './vocab-table.js';
 import { InteractiveSentenceCard } from './interactive-sentence-card.js';
 import { makeGamesHub } from './games-hub.js';
 import { makePageRead } from './page-read.js';
+import { makeBookViewer } from './book-viewer.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget, makeSubjectPicker, VocabTable, InteractiveSentenceCard, makeGamesHub, makePageRead, makeBookViewer };

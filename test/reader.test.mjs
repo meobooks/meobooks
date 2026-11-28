@@ -40,8 +40,9 @@ t('canTurn: không lật quá giới hạn ở cả hai chế độ', () => {
 });
 
 t('legacy dùng reader qua meoFeat', () => {
-  assert.equal(legacy.includes('meoFeat.reader.canTurn(dir,single,s,ci,maxS,maxC)'), true);
-  assert.equal(legacy.includes('meoFeat.reader.bookBounds(n)'), true);
+  const bookViewerSrc = readFileSync(new URL('../src/ui/book-viewer.js', import.meta.url), 'utf8');
+  assert.equal(bookViewerSrc.includes('meoFeat.reader.canTurn(dir,single,s,ci,maxS,maxC)'), true);
+  assert.equal(bookViewerSrc.includes('meoFeat.reader.bookBounds(n)'), true);
   const pageReadSrc = readFileSync(new URL('../src/ui/page-read.js', import.meta.url), 'utf8');
   assert.equal(pageReadSrc.includes('const hasInk=meoFeat.reader.hasInkStrokes(p);'), true);
 });
