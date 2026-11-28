@@ -3202,8 +3202,12 @@ function App(){
   useEffect(()=>{
     if(!supabase||!o||o.id==="preview-user")return;
     const e=window.meobooksServices.sync.subscribeRealtime(o.id,row=>{
-      const SY=window.meobooksServices.sync;
-      if(SY.shouldApplyRemote({status:st.current,remoteRow:row,lastWrittenAt:qe.current})){const r=SY.pickRemoteFields(row);r.prefs&&d(r.prefs),r.notebooks&&G(r.notebooks),r.pages&&U(r.pages),r.flashcards&&ae(r.flashcards),r.tasks&&se(r.tasks)}
+      if(!meoFeat.syncPolicy.shouldApplyRealtime({status:st.current,remoteUpdatedAt:row.updated_at,baseline:meoBaseStamp}))return;
+      const SY=window.meobooksServices.sync,c=de.current,r=SY.pickRemoteFields(row);
+      const next={prefs:r.prefs||c.prefs,notebooks:r.notebooks||c.notebooks,pages:r.pages||c.pages,flashcards:r.flashcards||c.flashcards,tasks:r.tasks||c.tasks};
+      d(next.prefs),G(next.notebooks),U(next.pages),ae(next.flashcards),se(next.tasks),de.current=next,Ee.current=null;
+      meoBaseStamp=row.updated_at;
+      try{window.meobooksServices.localStore.setLocalData(o.id,next)}catch{}
     });
     return()=>{e.unsubscribe()}
   },[o]);
