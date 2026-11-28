@@ -123,4 +123,30 @@ t('legacy: dùng module cho stampOf, mergeList và mergeData', () => {
   assert.ok(!legacy.includes('mergeData=(o,a)=>{var v,A;'));
 });
 
+t('tombstone: sổ tay và mục tiêu đã xóa không quay lại khi hợp nhất', () => {
+  const tombL = { prefs: { tombs: { notebooks: { n1: '2026-11-05T00:00:00Z' }, tasks: { k1: '2026-11-05T00:00:00Z' } } }, notebooks: [], pages: [], flashcards: [], tasks: [] };
+  const staleR = {
+    prefs: {},
+    notebooks: [{ id: 'n1', createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-01T00:00:00Z' }, { id: 'n2', createdAt: '2026-11-01T00:00:00Z' }],
+    pages: [], flashcards: [],
+    tasks: [{ id: 'k1', createdAt: '2026-11-01T00:00:00Z' }],
+  };
+  const r = M.mergeData(tombL, staleR);
+  assert.deepEqual(r.notebooks.map((x) => x.id), ['n2']);
+  assert.deepEqual(r.tasks.map((x) => x.id), []);
+});
+
+t('tombstone: sổ tay được sửa sau thời điểm xóa thì được giữ lại', () => {
+  const tombL = { prefs: { tombs: { notebooks: { n1: '2026-11-05T00:00:00Z' } } }, notebooks: [], pages: [], flashcards: [], tasks: [] };
+  const newerR = { prefs: {}, notebooks: [{ id: 'n1', createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-06T00:00:00Z' }], pages: [], flashcards: [], tasks: [] };
+  assert.deepEqual(M.mergeData(tombL, newerR).notebooks.map((x) => x.id), ['n1']);
+});
+
+t('legacy: xóa sổ tay và mục tiêu đều ghi tombstone', () => {
+  const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[nbEd.id]'));
+  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"notebooks",[e.id]'));
+  assert.ok(legacy.includes('meoFeat.dataMerge.addTombs(de.current.prefs,"tasks",[e.id]'));
+});
+
 console.log(`\n${pass} kiểm thử đạt`);

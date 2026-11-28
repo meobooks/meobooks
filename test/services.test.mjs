@@ -35,34 +35,10 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check(svc.hasClient() === false, 'chưa có client khi mới nạp');
 }
 
-// 2) mergeData/mergeList trong services khớp 100% với bản chuẩn src/features/data-merge.js
-// Bản chuẩn nay nằm trong src/features/data-merge.js (legacy đã dùng module này)
-const orig = DM;
+// 2) Hợp nhất không còn bản sao trong services: chỉ dùng src/features/data-merge.js
 {
   const { svc } = makeWindow();
-  let seed = 12345;
-  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
-  const pick = (a) => a[Math.floor(rnd() * a.length)];
-  const ts = () => new Date(Date.UTC(2026, 0, 1) + Math.floor(rnd() * 1e9)).toISOString();
-  const items = (p) => { const n = Math.floor(rnd() * 5), out = []; for (let i = 0; i < n; i++) { const it = { id: p + Math.floor(rnd() * 6), title: 't' + Math.floor(rnd() * 9) }; if (rnd() > 0.2) it.updatedAt = ts(); if (rnd() > 0.3) it.createdAt = ts(); out.push(it); } return out; };
-  const data = () => {
-    const act = {}; if (rnd() > 0.3) for (const d of ['2026-01-01', '2026-01-02']) if (rnd() > 0.4) act[d] = { xp: Math.floor(rnd() * 50), cards: Math.floor(rnd() * 5), mins: Math.floor(rnd() * 30), notes: Math.floor(rnd() * 3) };
-    const nb = {}; if (rnd() > 0.5) nb['nb' + Math.floor(rnd() * 3)] = items('v');
-    const vs = {}; if (rnd() > 0.5) vs['k' + Math.floor(rnd() * 3)] = { ok: Math.floor(rnd() * 9), bad: Math.floor(rnd() * 9), streak: Math.floor(rnd() * 9), last: ts() };
-    return { prefs: { displayName: pick(['A', 'B', undefined]), activity: act, nbViews: nb, vstats: vs, theme: pick(['light', 'dark']) }, notebooks: items('n'), pages: items('p'), flashcards: items('f'), tasks: items('t') };
-  };
-  let bad = 0;
-  for (let i = 0; i < 2000; i++) {
-    const L = data(), R = data();
-    if (!deq(orig.mergeData(L, R), svc.sync.mergeData(L, R))) bad++;
-    const A = items('x'), B = items('x');
-    if (!deq(orig.mergeList(A, B), svc.sync.mergeList(A, B))) bad++;
-  }
-  check(bad === 0, `mergeData/mergeList services khớp bản chuẩn (2000 ca, lệch: ${bad})`);
-  const tL = { prefs: { tombs: { pages: { p1: '2026-11-05T00:00:00Z' } } }, notebooks: [], pages: [{ id: 'p1', updatedAt: '2026-11-01T00:00:00Z' }, { id: 'p2', updatedAt: '2026-11-01T00:00:00Z' }], flashcards: [], tasks: [] };
-  const tR = { prefs: {}, notebooks: [], pages: [{ id: 'p1', updatedAt: '2026-11-01T00:00:00Z' }], flashcards: [], tasks: [] };
-  const expT = DM.mergeData(tL, tR);
-  check(deq(expT, svc.sync.mergeData(tL, tR)) && expT.pages.map((x) => x.id).join() === 'p2', 'tombstone: services và module cùng cho kết quả, p1 đã xóa còn p2');
+  check(svc.sync.mergeData === undefined && svc.sync.mergeList === undefined, 'services không còn bản sao mergeData/mergeList');
 }
 
 // 3) localStore: khóa và định dạng giữ nguyên
