@@ -7,6 +7,7 @@ const here = new URL('.', import.meta.url);
 const servicesSrc = readFileSync(new URL('../public/legacy/services.js', import.meta.url), 'utf8');
 const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
 const noiTuSrc = readFileSync(new URL('../src/ui/noi-tu.js', import.meta.url), 'utf8');
+const banTuSrc = readFileSync(new URL('../src/ui/bantu.js', import.meta.url), 'utf8');
 
 // Môi trường giả: window + localStorage + Notification không cần thiết
 function makeWindow(extra = {}) {
@@ -126,8 +127,8 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 {
   check(!legacy.includes('"bt_best_"+g.deckId'), 'legacy: finish bt không còn gọi localStorage trực tiếp cho bt_best_');
   check(!legacy.includes('lsGet("bt_best_"'), 'legacy: màn giới thiệu bt không còn lsGet("bt_best_")');
-  check(legacy.includes('LS.getBestScore("bt",g.deckId)') && legacy.includes('LS.setBestScore("bt",g.deckId,g.score)'), 'legacy: finish bt dùng getBestScore/setBestScore');
-  check(legacy.includes('window.meobooksServices.localStore.getBestScore("bt",deck.id)'), 'legacy: màn giới thiệu bt đọc qua getBestScore');
+  check(banTuSrc.includes('LS.getBestScore("bt",g.deckId)') && banTuSrc.includes('LS.setBestScore("bt",g.deckId,g.score)'), 'bantu: finish bt dùng getBestScore/setBestScore');
+  check(banTuSrc.includes('window.meobooksServices.localStore.getBestScore("bt",deck.id)'), 'bantu: màn giới thiệu bt đọc qua getBestScore');
 }
 
 // 8) Lưu trữ cục bộ: nt_best_* (điểm cao nhất Nối Từ)
@@ -371,5 +372,5 @@ const deq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   check((legacy.match(/sync\.upsertRow\(/g) || []).length === 2 && (legacy.match(/sync\.fetchRow\(/g) || []).length === 3, 'legacy: 2 chỗ upsertRow, 3 chỗ fetchRow (tải, kiểm tra trước khi ghi, thử lại)');
   check(!/sync\.upsertRow\(e\.id,O\)/.test(legacy), 'legacy: không ghi dữ liệu mặc định lên tài khoản khi chưa tải được');
   check(legacy.includes('meoCloudLoaded=true') && legacy.includes('cloudLoaded:meoCloudLoaded'), 'legacy: chặn lưu toàn dòng khi chưa tải xong dữ liệu');
-  check(legacy.includes('getRaw(k,d)') && legacy.includes('setRaw(k,v)'), 'legacy: lsGet/lsSet chuyển sang getRaw/setRaw');
+  check(banTuSrc.includes('getRaw(k,d)') && banTuSrc.includes('setRaw(k,v)'), 'bantu: lsGet/lsSet chuyển sang getRaw/setRaw');
 }

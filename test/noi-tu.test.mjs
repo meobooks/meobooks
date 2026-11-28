@@ -17,7 +17,7 @@ t('src/ui/noi-tu.js xuất makeNoiTu nhận các phụ thuộc đã truyền và
 t('src/ui/index.js gom makeNoiTu', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeNoiTu } from './noi-tu.js';"));
-  assert.ok(s.includes('makeNoiTu, makeJlptVocab, makeInkLayer };'));
+  assert.ok(s.includes('makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu };'));
 });
 
 t('legacy: NoiTu lấy từ meoFeat.ui, classOf truyền qua hàm bọc (tránh TDZ), không còn định nghĩa lại', () => {

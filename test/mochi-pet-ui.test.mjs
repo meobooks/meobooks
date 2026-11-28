@@ -17,7 +17,7 @@ t('src/ui/mochi-pet.js xuất makeMochiPet nhận các phụ thuộc đã truy�
 t('src/ui/index.js gom makeMochiPet', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeMochiPet } from './mochi-pet.js';"));
-  assert.ok(s.includes('makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer };'));
+  assert.ok(s.includes('makeMochiPet, makeRmLesson, makeNoiTu, makeJlptVocab, makeInkLayer, makeBanTu };'));
 });
 
 t('legacy: MochiPet lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

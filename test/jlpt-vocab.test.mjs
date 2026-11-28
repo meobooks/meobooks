@@ -17,7 +17,7 @@ t('src/ui/jlpt-vocab.js xuất makeJlptVocab với đầy đủ phụ thuộc', 
 t('src/ui/index.js gom makeJlptVocab', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeJlptVocab } from './jlpt-vocab.js';"));
-  assert.ok(s.includes('makeJlptVocab, makeInkLayer };'));
+  assert.ok(s.includes('makeJlptVocab, makeInkLayer, makeBanTu };'));
 });
 
 t('legacy: JlptVocab lấy từ meoFeat.ui; langOfWord và classOf truyền qua hàm bọc, không còn định nghĩa lại', () => {
