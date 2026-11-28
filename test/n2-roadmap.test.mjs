@@ -17,7 +17,7 @@ t('src/ui/n2-roadmap.js xuất makeN2Roadmap nhận các phụ thuộc đã truy
 t('src/ui/index.js gom makeN2Roadmap', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeN2Roadmap } from './n2-roadmap.js';"));
-  assert.ok(s.includes('makeN2Roadmap };'));
+  assert.ok(s.includes('makeN2Roadmap, makePomodoroWidget };'));
 });
 
 t('legacy: N2Roadmap lấy từ meoFeat.ui, không còn định nghĩa lại', () => {

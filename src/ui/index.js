@@ -7,5 +7,6 @@ import { drawStroke, InkView } from './ink.js';
 import { makeReadView } from './read-view.js';
 import { makeNbEditModal } from './nb-edit-modal.js';
 import { makeN2Roadmap } from './n2-roadmap.js';
+import { makePomodoroWidget } from './pomodoro-widget.js';
 
-export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap };
+export const ui = { JCard, JLoading, JlptGame, makeUseJlpt, makeJlptStudy, drawStroke, InkView, makeReadView, makeNbEditModal, makeN2Roadmap, makePomodoroWidget };

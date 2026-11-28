@@ -29,12 +29,13 @@ t('documentTitle theo trạng thái chạy', () => {
   assert.equal(P.documentTitle(false, '25:00'), 'meobooks');
 });
 
-t('legacy gọi đúng 3 chỗ qua meoFeat, không còn thẻ script cũ', () => {
-  const count = (s) => legacy.split(s).length - 1;
+t('PomodoroWidget gọi đúng 3 chỗ qua meoFeat (nay trong src/ui/pomodoro-widget.js), legacy không còn thẻ script cũ', () => {
+  const pw = readFileSync(new URL('../src/ui/pomodoro-widget.js', import.meta.url), 'utf8');
+  const count = (s) => pw.split(s).length - 1;
   assert.equal(count('meoFeat.pomodoro.remainingSeconds(R.current,Date.now())'), 1);
   assert.equal(count('meoFeat.pomodoro.countsAsSession(v)&&a(v)'), 1);
   assert.equal(count('meoFeat.pomodoro.documentTitle(u,fmtTime(f))'), 1);
-  assert.equal(count('src="pomodoro.js"'), 0);
+  assert.equal(legacy.split('src="pomodoro.js"').length - 1, 0);
 });
 
 t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
@@ -48,7 +49,7 @@ t('App.jsx gắn pomodoro lên window trước khi iframe chạy', () => {
 console.log(`\n${passed} kiểm thử đạt.`);
 
 // Nút Pomodoro phải nằm trên thanh bên (aside có z-40) trên màn hình lớn
-const legacyPZ = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
+const legacyPZ = readFileSync(new URL('../src/ui/pomodoro-widget.js', import.meta.url), 'utf8');
 assert.equal(legacyPZ.split('no-print fixed bottom-4 left-4 z-50').length - 1, 2);
 assert.equal(legacyPZ.includes('no-print fixed bottom-4 left-4 z-40'), false);
 console.log('ok - nút Pomodoro có z-50, nằm trên thanh bên');
