@@ -26,3 +26,6 @@ export const newlyUnlocked = (defs, stats, owned = []) => {
   const have = new Set(owned);
   return defs.filter((m) => !have.has(m.id) && m.test(stats));
 };
+
+// Nhiệm vụ hằng ngày và hằng tuần (chuyển từ app cũ).
+export const QUEST_DEFS = [{id:"d_review20",type:"daily",title:"Ôn 20 thẻ",icon:"",target:20,exp:2,gold:10,ev:"review"},{id:"d_add5",type:"daily",title:"Thêm 5 từ mới",icon:"",target:5,exp:2,gold:10,ev:"add"},{id:"d_session1",type:"daily",title:"Hoàn thành 1 buổi học bài",icon:"",target:1,exp:1,gold:10,ev:"session"},{id:"w_review100",type:"weekly",title:"Ôn 100 thẻ trong tuần",icon:"",target:100,exp:5,gold:10,ev:"review"},{id:"w_add25",type:"weekly",title:"Thêm 25 từ trong tuần",icon:"",target:25,exp:3,gold:10,ev:"add"},{id:"w_session5",type:"weekly",title:"5 buổi học bài",icon:"",target:5,exp:5,gold:10,ev:"session"}];
