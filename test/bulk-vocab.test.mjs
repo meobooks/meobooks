@@ -47,7 +47,8 @@ t('parseVocabPaste: bỏ khoảng trắng đầu/cuối toàn bộ văn bản', 
 
 t('legacy: dùng module cho nhập hàng loạt JLPT và nhập dán', () => {
   const legacy = readFileSync(new URL('../public/legacy/index.html', import.meta.url), 'utf8');
-  assert.ok(legacy.includes('meoFeat.bulkVocab.parseBulkLines(bulk,bulkNb||firstNb)'));
+  const jlptVocabSrc = readFileSync(new URL('../src/ui/jlpt-vocab.js', import.meta.url), 'utf8');
+  assert.ok(jlptVocabSrc.includes('meoFeat.bulkVocab.parseBulkLines(bulk,bulkNb||firstNb)'));
   assert.ok(legacy.includes('meoFeat.bulkVocab.parseVocabPaste(Ve)'));
 });
 

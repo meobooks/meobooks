@@ -17,7 +17,7 @@ t('src/ui/rm-lesson.js xuất makeRmLesson nhận rmNorm, VocabTable, meoFeat', 
 t('src/ui/index.js gom makeRmLesson', () => {
   const s = read('src/ui/index.js');
   assert.ok(s.includes("import { makeRmLesson } from './rm-lesson.js';"));
-  assert.ok(s.includes('makeRmLesson, makeNoiTu };'));
+  assert.ok(s.includes('makeRmLesson, makeNoiTu, makeJlptVocab };'));
 });
 
 t('legacy: RmLesson lấy từ meoFeat.ui, không còn định nghĩa lại', () => {
