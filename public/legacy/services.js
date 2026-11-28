@@ -67,87 +67,10 @@
     setNotifDay(day) { setRaw(this.NOTIF_KEY, day); },
   };
 
-  // ---------- sync: phần thuần (giữ NGUYÊN logic legacy) ----------
-  const stampOf = (o) => Date.parse(o.updatedAt || '') || 0;
-
-  function mergeList(o, a, c) {
-    o = o || []; a = a || []; c = c || stampOf;
-    const b = new Map(a.map((v) => [v.id, v]));
-    o.forEach((v) => {
-      const A = b.get(v.id);
-      if (!A || c(v) >= c(A)) b.set(v.id, v);
-    });
-    return [...b.values()];
-  }
-
-  // Đánh dấu xóa (tombstone) trong prefs.tombs — logic giống src/features/data-merge.js
-  function mergeTombs(x, y) {
-    const out = {};
-    ['pages', 'nbViews', 'notebooks', 'tasks'].forEach((k) => {
-      const m = Object.assign({}, ((x || {})[k]) || {});
-      Object.entries(((y || {})[k]) || {}).forEach(([id, t]) => {
-        if (!m[id] || (Date.parse(t) || 0) > (Date.parse(m[id]) || 0)) m[id] = t;
-      });
-      out[k] = m;
-    });
-    return out;
-  }
-
-  function applyTombs(list, tombs) {
-    const t = tombs || {};
-    return (list || []).filter((it) => {
-      const del = t[it.id];
-      if (!del) return true;
-      const stamp = Date.parse(it.updatedAt || it.createdAt || '') || 0;
-      return stamp > (Date.parse(del) || 0);
-    });
-  }
-
-  function mergeData(o, a) {
-    const activity = Object.assign({}, (a.prefs && a.prefs.activity) || {});
-    Object.entries((o.prefs && o.prefs.activity) || {}).forEach(([f, L]) => {
-      const u = activity[f] || {};
-      activity[f] = {
-        xp: Math.max(L.xp || 0, u.xp || 0),
-        cards: Math.max(L.cards || 0, u.cards || 0),
-        mins: Math.max(L.mins || 0, u.mins || 0),
-        notes: Math.max(L.notes || 0, u.notes || 0),
-      };
-    });
-    const byCreated = (f, L) => (L.createdAt || '').localeCompare(f.createdAt || '');
-    const nbViewsA = (a.prefs && a.prefs.nbViews) || {};
-    const nbViewsO = (o.prefs && o.prefs.nbViews) || {};
-    const mergedNbViews = Object.assign({}, nbViewsA);
-    Object.entries(nbViewsO).forEach(([k, arr]) => {
-      mergedNbViews[k] = mergeList(arr, mergedNbViews[k] || [], (x) => Date.parse(x.updatedAt || '') || 0);
-    });
-    const vstatsA = (a.prefs && a.prefs.vstats) || {};
-    const vstatsO = (o.prefs && o.prefs.vstats) || {};
-    const mergedVstats = Object.assign({}, vstatsA);
-    Object.entries(vstatsO).forEach(([k, st]) => {
-      const old = mergedVstats[k] || { ok: 0, bad: 0, streak: 0 };
-      mergedVstats[k] = {
-        ok: Math.max(old.ok || 0, st.ok || 0),
-        bad: Math.max(old.bad || 0, st.bad || 0),
-        streak: Math.max(old.streak || 0, st.streak || 0),
-        last: st.last || old.last,
-      };
-    });
-    const tombs = mergeTombs(a.prefs && a.prefs.tombs, o.prefs && o.prefs.tombs);
-    Object.keys(mergedNbViews).forEach((k) => { mergedNbViews[k] = applyTombs(mergedNbViews[k], tombs.nbViews); });
-    return {
-      prefs: Object.assign({}, a.prefs || {}, o.prefs || {}, { activity, nbViews: mergedNbViews, vstats: mergedVstats, tombs }),
-      notebooks: applyTombs(mergeList(o.notebooks, a.notebooks).sort(byCreated), tombs.notebooks),
-      pages: applyTombs(mergeList(o.pages, a.pages).sort(byCreated), tombs.pages),
-      flashcards: mergeList(o.flashcards, a.flashcards),
-      tasks: applyTombs(mergeList(o.tasks, a.tasks), tombs.tasks),
-    };
-  }
+  // ---------- sync: phần thuần ----------
+  // Hợp nhất dữ liệu nằm trong src/features/data-merge.js (legacy dùng module đó, không sao chép ở đây).
 
   const sync = {
-    stampOf,
-    mergeList,
-    mergeData,
     shouldApplyRemote({ status, remoteRow, lastWrittenAt }) {
       return !!remoteRow && status === 'saved' && remoteRow.updated_at !== lastWrittenAt;
     },
